@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -40,8 +42,12 @@ class MainActivity : ComponentActivity() {
 fun WeatherScreen() {
     val currentDay = remember { mutableStateOf(MORNING) }
     val transition = updateTransition(currentDay.value, label = "")
-    val groundColor = transition.animateColor(label = "", transitionSpec = { tween(400) }) {
-        when(it) {
+    val groundColor = transition.animateColor(
+        label = "",
+        transitionSpec = {
+            tween(410)
+        }) {
+        when (it) {
             MORNING -> Color(0xFF5A3C6E)
             AFTERNOON -> Color(0xFF3C6157)
             NIGHT -> Color(0xFF1B2F5C)
@@ -55,17 +61,18 @@ fun WeatherScreen() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(100.dp)
                 .background(groundColor.value),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             Button(modifier = Modifier.padding(8.dp),
                 onClick = { currentDay.value = MORNING }) {
                 Text(text = "REGGEL")
             }
-            Button(modifier = Modifier.padding(8.dp),onClick = { currentDay.value = AFTERNOON }) {
+            Button(modifier = Modifier.padding(8.dp), onClick = { currentDay.value = AFTERNOON }) {
                 Text(text = "DÉLUTÁN")
             }
-            Button(modifier = Modifier.padding(8.dp),onClick = { currentDay.value = NIGHT }) {
+            Button(modifier = Modifier.padding(8.dp), onClick = { currentDay.value = NIGHT }) {
                 Text(text = "ESTE")
             }
         }
@@ -74,21 +81,56 @@ fun WeatherScreen() {
 
 @Composable
 fun SunAndMoon(dayChangeTransition: Transition<Day>) {
-    val offset = dayChangeTransition.animateDp(label = "") {
-        when(it) {
-            MORNING -> 0.dp
-            AFTERNOON -> 50.dp
+    val sunOffset = dayChangeTransition.animateDp(
+        label = "",
+        transitionSpec = {
+            val delay =
+                if (NIGHT isTransitioningTo AFTERNOON || NIGHT isTransitioningTo MORNING) 300 else 0
+            tween(300, delay)
+        }) {
+        when (it) {
+            MORNING -> (-50).dp
+            AFTERNOON -> (-150).dp
             NIGHT -> 100.dp
         }
     }
-    Icon(
+    val moonOffset =
+        dayChangeTransition.animateDp(
+            label = "",
+            transitionSpec = {
+                val delay =
+                    if (MORNING isTransitioningTo NIGHT || AFTERNOON isTransitioningTo NIGHT) 300 else 0
+                tween(300, delay)
+            }) {
+            when (it) {
+                AFTERNOON,
+                MORNING -> 100.dp
+                NIGHT -> (-150).dp
+            }
+        }
+    Box(
         modifier = Modifier
-            .height(48.dp)
-            .width(48.dp)
-            .absoluteOffset(x = offset.value),
-        imageVector = Icons.Default.CheckCircle,
-        contentDescription = null
-    )
+            .fillMaxWidth()
+            .absolutePadding(right = 32.dp),
+        contentAlignment = Alignment.TopEnd
+    ) {
+        Icon(
+            modifier = Modifier
+                .height(48.dp)
+                .width(48.dp)
+                .absoluteOffset(y = sunOffset.value),
+            imageVector = Icons.Default.CheckCircle,
+            contentDescription = null
+        )
+        Icon(
+            modifier = Modifier
+                .height(48.dp)
+                .width(48.dp)
+                .absoluteOffset(y = moonOffset.value),
+            imageVector = Icons.Default.Email,
+            contentDescription = null
+        )
+    }
 }
 
 @Composable
@@ -103,29 +145,31 @@ fun LandScape(dayChangeTransition: Transition<Day>) {
         transitionSpec = { tween(400) }) {
         if (it == NIGHT) 1f else 0f
     }
-    Image(
-        modifier = Modifier
-            .fillMaxWidth(),
-        painter = painterResource(id = R.drawable.landscape_morning),
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
-    )
-    Image(
-        modifier = Modifier
-            .fillMaxWidth(),
-        painter = painterResource(id = R.drawable.landscape_afternoon),
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
-        alpha = afternoonLandscapeAlpha.value
-    )
-    Image(
-        modifier = Modifier
-            .fillMaxWidth(),
-        painter = painterResource(id = R.drawable.landscape_night),
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
-        alpha = nightLandscapeAlpha.value
-    )
+    Box {
+        Image(
+            modifier = Modifier
+                .fillMaxWidth(),
+            painter = painterResource(id = R.drawable.landscape_morning),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+        )
+        Image(
+            modifier = Modifier
+                .fillMaxWidth(),
+            painter = painterResource(id = R.drawable.landscape_afternoon),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            alpha = afternoonLandscapeAlpha.value
+        )
+        Image(
+            modifier = Modifier
+                .fillMaxWidth(),
+            painter = painterResource(id = R.drawable.landscape_night),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            alpha = nightLandscapeAlpha.value
+        )
+    }
 }
 
 @Preview(showBackground = true)
