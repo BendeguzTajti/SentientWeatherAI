@@ -10,7 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -42,28 +42,17 @@ class MainActivity : ComponentActivity() {
 fun WeatherScreen() {
     val currentDay = remember { mutableStateOf(MORNING) }
     val transition = updateTransition(currentDay.value, label = "")
-    val groundColor = transition.animateColor(
-        label = "",
-        transitionSpec = {
-            tween(410)
-        }) {
-        when (it) {
-            MORNING -> Color(0xFF5A3C6E)
-            AFTERNOON -> Color(0xFF3C6157)
-            NIGHT -> Color(0xFF1B2F5C)
-        }
-    }
     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
-        Box {
-            SunAndMoon(dayChangeTransition = transition)
+        Box(modifier = Modifier.weight(6f), contentAlignment = Alignment.BottomCenter) {
             LandScape(dayChangeTransition = transition)
         }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(100.dp)
-                .background(groundColor.value),
+                .weight(3f)
+                .background(MaterialTheme.colors.surface),
             horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Button(modifier = Modifier.padding(8.dp),
                 onClick = { currentDay.value = MORNING }) {
@@ -80,72 +69,32 @@ fun WeatherScreen() {
 }
 
 @Composable
-fun SunAndMoon(dayChangeTransition: Transition<Day>) {
-    val sunOffset = dayChangeTransition.animateDp(
-        label = "",
-        transitionSpec = {
-            val delay =
-                if (NIGHT isTransitioningTo AFTERNOON || NIGHT isTransitioningTo MORNING) 300 else 0
-            tween(300, delay)
-        }) {
-        when (it) {
-            MORNING -> (-50).dp
-            AFTERNOON -> (-150).dp
-            NIGHT -> 100.dp
-        }
-    }
-    val moonOffset =
-        dayChangeTransition.animateDp(
-            label = "",
-            transitionSpec = {
-                val delay =
-                    if (MORNING isTransitioningTo NIGHT || AFTERNOON isTransitioningTo NIGHT) 300 else 0
-                tween(300, delay)
-            }) {
-            when (it) {
-                AFTERNOON,
-                MORNING -> 100.dp
-                NIGHT -> (-150).dp
-            }
-        }
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .absolutePadding(right = 32.dp),
-        contentAlignment = Alignment.TopEnd
-    ) {
-        Icon(
-            modifier = Modifier
-                .height(48.dp)
-                .width(48.dp)
-                .absoluteOffset(y = sunOffset.value),
-            imageVector = Icons.Default.CheckCircle,
-            contentDescription = null
-        )
-        Icon(
-            modifier = Modifier
-                .height(48.dp)
-                .width(48.dp)
-                .absoluteOffset(y = moonOffset.value),
-            imageVector = Icons.Default.Email,
-            contentDescription = null
-        )
-    }
-}
-
-@Composable
 fun LandScape(dayChangeTransition: Transition<Day>) {
-    val afternoonLandscapeAlpha = dayChangeTransition.animateFloat(
-        label = "",
+    val skyColor = dayChangeTransition.animateColor(
+        label = "skyColorAnimation",
         transitionSpec = { tween(400) }) {
-        if (it == AFTERNOON || it == NIGHT) 1f else 0f
+        when (it) {
+            MORNING -> Color(0xFFEFA093)
+            AFTERNOON -> Color(0xFF52DCFF)
+            NIGHT -> Color(0xFF6963B8)
+        }
+    }
+    val afternoonLandscapeAlpha = dayChangeTransition.animateFloat(
+        label = "afternoonLandscapeAlphaAnimation",
+        transitionSpec = { tween(400) }) {
+        if (it == AFTERNOON) 1f else 0f
     }
     val nightLandscapeAlpha = dayChangeTransition.animateFloat(
-        label = "",
+        label = "nightLandscapeAlphaAnimation",
         transitionSpec = { tween(400) }) {
         if (it == NIGHT) 1f else 0f
     }
-    Box {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = skyColor.value),
+        contentAlignment = Alignment.BottomCenter
+    ) {
         Image(
             modifier = Modifier
                 .fillMaxWidth(),
