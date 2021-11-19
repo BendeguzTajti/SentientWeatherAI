@@ -62,6 +62,23 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
-
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.17.0"
+
+    // Coroutines
+    def coroutine_version = "1.5.1"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutine_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutine_version"
+
+    // Coroutine Lifecycle Scopes
+    def coroutine_lifecycle_scopes_version = "2.4.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$coroutine_lifecycle_scopes_version"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$coroutine_lifecycle_scopes_version"
+
+    // Retrofit
+    def retrofit_version = "2.9.0"
+    def retrofit_okhttp_version = "5.0.0-alpha.2"
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+    implementation "com.squareup.okhttp3:okhttp:$retrofit_okhttp_version"
+    implementation "com.squareup.okhttp3:logging-interceptor:$retrofit_okhttp_version"
 }
