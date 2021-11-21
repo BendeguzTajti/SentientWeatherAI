@@ -1,9 +1,9 @@
 package hu.friedcoyote.sentientweatherai.presentation.weather
 
-import hu.friedcoyote.sentientweatherai.data.remote.dto.WeatherDto
+import hu.friedcoyote.sentientweatherai.domain.model.Weather
 
 data class WeatherState(
     val isLoading: Boolean = false,
-    val weather: WeatherDto? = null,
+    val weather: Weather? = null,
     val error: String = ""
 )

@@ -24,13 +24,13 @@ class WeatherViewModel @Inject constructor(
     }
 
     private fun getWeather() {
-        getCurrentWeatherUseCase(listOf("minutely")).onEach { result ->
+        getCurrentWeatherUseCase(47.4979, 19.0402, listOf("minutely")).onEach { result ->
             when (result) {
                 is Resource.Loading -> {
-
+                    _weatherState.value = WeatherState(isLoading = true)
                 }
                 is Resource.Success -> {
-
+                    _weatherState.value = WeatherState(weather = result.data)
                 }
                 is Resource.Error -> {
 

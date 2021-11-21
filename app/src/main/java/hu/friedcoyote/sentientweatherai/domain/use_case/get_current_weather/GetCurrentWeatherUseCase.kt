@@ -13,10 +13,10 @@ import javax.inject.Inject
 class GetCurrentWeatherUseCase @Inject constructor(
     private val repository: WeatherRepository
 ) {
-    operator fun invoke(exclude: List<String>?): Flow<Resource<Weather>> = flow {
+    operator fun invoke(lat: Double, lon: Double, exclude: List<String>?): Flow<Resource<Weather>> = flow {
         try {
             emit(Resource.Loading<Weather>())
-            val weather = repository.getCurrentWeather(47.4979, 19.0402, exclude)
+            val weather = repository.getCurrentWeather(lat, lon, exclude)
             emit(Resource.Success<Weather>(weather.toWeather()))
         } catch (e: HttpException) {
             emit(Resource.Error<Weather>("ERROR"))
