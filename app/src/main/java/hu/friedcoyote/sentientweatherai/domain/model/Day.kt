@@ -1,4 +1,4 @@
-package hu.friedcoyote.sentientweatherai.model
+package hu.friedcoyote.sentientweatherai.domain.model
 
 enum class Day {
     MORNING,

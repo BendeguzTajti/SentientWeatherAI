@@ -1,4 +1,4 @@
-package hu.friedcoyote.sentientweatherai.ui.theme
+package hu.friedcoyote.sentientweatherai.presentation.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
