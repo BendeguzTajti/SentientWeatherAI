@@ -17,7 +17,7 @@ fun ForecastListItem(
     forecast: Forecast
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(modifier = Modifier.padding(bottom = 4.dp), text = "NOW")
+        Text(modifier = Modifier.padding(bottom = 4.dp), text = forecast.timeLabel)
         Icon(
             painter = painterResource(id = R.drawable.ic_clear_sky_day),
             contentDescription = forecast.description

@@ -47,11 +47,11 @@ fun DefaultPreview() {
         val currentDay = remember { mutableStateOf(Day.MORNING) }
         val transition = updateTransition(currentDay.value, label = "")
         val hourlyForecasts = listOf(
-            Forecast(Date(), 18, 21, ""),
-            Forecast(Date(), 18, 21, ""),
-            Forecast(Date(), 18, 21, ""),
-            Forecast(Date(), 18, 21, ""),
-            Forecast(Date(), 18, 21, "")
+            Forecast(Date(), "12:00", 18, 21, ""),
+            Forecast(Date(), "12:00", 18, 21, ""),
+            Forecast(Date(), "12:00",18, 21, ""),
+            Forecast(Date(), "12:00",18, 21, ""),
+            Forecast(Date(), "12:00",18, 21, "")
         )
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
             Box(

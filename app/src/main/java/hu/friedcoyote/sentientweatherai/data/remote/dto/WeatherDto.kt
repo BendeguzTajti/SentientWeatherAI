@@ -1,7 +1,10 @@
 package hu.friedcoyote.sentientweatherai.data.remote.dto
 
+import android.util.Log
 import com.google.gson.annotations.SerializedName
 import hu.friedcoyote.sentientweatherai.domain.model.Weather
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.math.roundToInt
 
 data class WeatherDto(
@@ -17,12 +20,17 @@ data class WeatherDto(
 )
 
 fun WeatherDto.toWeather(): Weather {
+    val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault()).apply {
+        this.timeZone = TimeZone.getTimeZone(timezone)
+    }
+    if (current != null) {
+    }
     return Weather(
         temperatureCelsius = if (current != null) (current.temp - 273.15).roundToInt() else null,
         temperatureFahrenheit = if (current != null) (((current.temp - 273.15) * 9 / 5) + 32).roundToInt() else null,
         description = current?.weather?.firstOrNull()?.description ?: "",
-        hourlyForecasts = hourly?.filterIndexed { i, _ -> i != 0 && i % 3 == 0 }?.take(5)
-            ?.map { it.toForecast() } ?: emptyList(),
-        dailyForecasts = daily?.drop(1)?.take(5)?.map { it.toForecast() } ?: emptyList()
+        hourlyForecasts = hourly?.filterIndexed { i, _ -> i % 3 == 0 }?.take(5)
+            ?.map { it.toForecast(dateFormat) } ?: emptyList(),
+        dailyForecasts = daily?.drop(1)?.take(5)?.map { it.toForecast(dateFormat) } ?: emptyList()
     )
 }

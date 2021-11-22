@@ -2,6 +2,7 @@ package hu.friedcoyote.sentientweatherai.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 import hu.friedcoyote.sentientweatherai.domain.model.Forecast
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -28,9 +29,11 @@ data class Hourly(
     val windSpeed: Double
 )
 
-fun Hourly.toForecast(): Forecast {
+fun Hourly.toForecast(dateFormat: SimpleDateFormat): Forecast {
+    val date = Date(dt * 1000)
     return Forecast(
-        Date(dt),
+        date = date,
+        timeLabel = dateFormat.format(date),
         temperatureCelsius = (temp - 273.15).roundToInt(),
         temperatureFahrenheit = (((temp - 273.15) * 9 / 5) + 32).roundToInt(),
         description = weather.firstOrNull()?.description ?: ""
