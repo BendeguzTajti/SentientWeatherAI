@@ -3,7 +3,8 @@ package hu.friedcoyote.sentientweatherai.presentation.weather
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -16,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import hu.friedcoyote.sentientweatherai.domain.model.Day
+import hu.friedcoyote.sentientweatherai.presentation.weather.components.ForecastListItem
 import hu.friedcoyote.sentientweatherai.presentation.weather.components.Landscape
 
 @Composable
@@ -26,7 +28,11 @@ fun WeatherScreen(
     val currentDay = remember { mutableStateOf(Day.MORNING) }
     val transition = updateTransition(currentDay.value, label = "")
     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
-        Box(modifier = Modifier.fillMaxSize().weight(6f), contentAlignment = Alignment.BottomCenter) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(6f), contentAlignment = Alignment.BottomCenter
+        ) {
             Landscape(dayChangeTransition = transition)
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -44,23 +50,26 @@ fun WeatherScreen(
                 }
             }
         }
-        Row(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
+                .padding(12.dp)
                 .weight(3f)
                 .background(MaterialTheme.colors.surface),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(modifier = Modifier.padding(8.dp),
-                onClick = { currentDay.value = Day.MORNING }) {
-                Text(text = "REGGEL")
-            }
-            Button(modifier = Modifier.padding(8.dp), onClick = { currentDay.value = Day.AFTERNOON }) {
-                Text(text = "DÉLUTÁN")
-            }
-            Button(modifier = Modifier.padding(8.dp), onClick = { currentDay.value = Day.NIGHT }) {
-                Text(text = "ESTE")
+            Text(
+                modifier = Modifier.padding(bottom = 12.dp),
+                text = "Today",
+                style = MaterialTheme.typography.h5,
+                fontWeight = FontWeight.SemiBold
+            )
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                items(weatherState.weather?.hourlyForecasts ?: emptyList()) { forecast ->
+                    ForecastListItem(forecast = forecast)
+                }
             }
         }
     }
