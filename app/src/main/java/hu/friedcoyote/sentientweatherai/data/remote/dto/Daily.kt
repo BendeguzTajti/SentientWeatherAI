@@ -41,6 +41,7 @@ fun Daily.toForecast(dateFormat: SimpleDateFormat): Forecast {
         timeLabel = dateFormat.format(date),
         temperatureCelsius = (temp.day - 273.15).roundToInt(),
         temperatureFahrenheit = (((temp.day - 273.15) * 9 / 5) + 32).roundToInt(),
-        description = weather.firstOrNull()?.description ?: ""
+        weatherType = weather.first().main,
+        description = weather.first().description
     )
 }

@@ -36,6 +36,7 @@ fun Hourly.toForecast(dateFormat: SimpleDateFormat): Forecast {
         timeLabel = dateFormat.format(date),
         temperatureCelsius = (temp - 273.15).roundToInt(),
         temperatureFahrenheit = (((temp - 273.15) * 9 / 5) + 32).roundToInt(),
-        description = weather.firstOrNull()?.description ?: ""
+        weatherType = weather.first().main,
+        description = weather.first().description
     )
 }

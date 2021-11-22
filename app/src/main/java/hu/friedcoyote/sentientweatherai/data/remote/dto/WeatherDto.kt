@@ -24,6 +24,7 @@ fun WeatherDto.toWeather(): Weather {
         this.timeZone = TimeZone.getTimeZone(timezone)
     }
     if (current != null) {
+        Log.d("KAKA", "toWeather: ${dateFormat.format(Date(current.dt * 1000))}")
     }
     return Weather(
         temperatureCelsius = if (current != null) (current.temp - 273.15).roundToInt() else null,

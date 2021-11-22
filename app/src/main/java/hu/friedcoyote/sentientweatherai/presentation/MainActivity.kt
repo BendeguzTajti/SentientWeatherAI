@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dagger.hilt.android.AndroidEntryPoint
+import hu.friedcoyote.sentientweatherai.data.remote.dto.WeatherType
 import hu.friedcoyote.sentientweatherai.domain.model.Day
 import hu.friedcoyote.sentientweatherai.domain.model.Forecast
 import hu.friedcoyote.sentientweatherai.presentation.ui.theme.SentientWeatherAITheme
@@ -47,11 +48,11 @@ fun DefaultPreview() {
         val currentDay = remember { mutableStateOf(Day.MORNING) }
         val transition = updateTransition(currentDay.value, label = "")
         val hourlyForecasts = listOf(
-            Forecast(Date(), "12:00", 18, 21, ""),
-            Forecast(Date(), "12:00", 18, 21, ""),
-            Forecast(Date(), "12:00",18, 21, ""),
-            Forecast(Date(), "12:00",18, 21, ""),
-            Forecast(Date(), "12:00",18, 21, "")
+            Forecast(Date(), "12:00", 18, 21, WeatherType.Clear, ""),
+            Forecast(Date(), "12:00", 18, 21, WeatherType.Tornado,""),
+            Forecast(Date(), "12:00",18, 21, WeatherType.Rain,""),
+            Forecast(Date(), "12:00",18, 21, WeatherType.Thunderstorm,""),
+            Forecast(Date(), "12:00",18, 21, WeatherType.Haze,"")
         )
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
             Box(
