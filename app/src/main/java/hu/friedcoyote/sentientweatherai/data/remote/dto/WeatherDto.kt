@@ -24,14 +24,14 @@ fun WeatherDto.toWeather(): Weather {
         this.timeZone = TimeZone.getTimeZone(timezone)
     }
     if (current != null) {
-        Log.d("KAKA", "toWeather: ${dateFormat.format(Date(current.dt * 1000))}")
     }
     return Weather(
+        zoneId = timezone,
         temperatureCelsius = if (current != null) (current.temp - 273.15).roundToInt() else null,
         temperatureFahrenheit = if (current != null) (((current.temp - 273.15) * 9 / 5) + 32).roundToInt() else null,
         description = current?.weather?.firstOrNull()?.description ?: "",
-        hourlyForecasts = hourly?.filterIndexed { i, _ -> i % 3 == 0 }?.take(5)
-            ?.map { it.toForecast(dateFormat) } ?: emptyList(),
-        dailyForecasts = daily?.drop(1)?.take(5)?.map { it.toForecast(dateFormat) } ?: emptyList()
+        hourlyForecasts = hourly?.drop(1)?.filterIndexed { i, _ -> i % 2 == 0 }?.take(5)
+            ?.map { it.toForecast() } ?: emptyList(),
+        dailyForecasts = daily?.drop(1)?.take(5)?.map { it.toForecast() } ?: emptyList()
     )
 }

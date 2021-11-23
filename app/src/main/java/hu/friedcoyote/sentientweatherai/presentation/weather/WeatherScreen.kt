@@ -1,5 +1,6 @@
 package hu.friedcoyote.sentientweatherai.presentation.weather
 
+import android.text.format.DateFormat
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,17 +14,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import hu.friedcoyote.sentientweatherai.domain.model.Day
 import hu.friedcoyote.sentientweatherai.presentation.weather.components.ForecastListItem
 import hu.friedcoyote.sentientweatherai.presentation.weather.components.Landscape
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
 fun WeatherScreen(
     viewModel: WeatherViewModel = hiltViewModel()
 ) {
+    val pattern = if (DateFormat.is24HourFormat(LocalContext.current)) "HH:mm" else "hh:mm"
+    val dateFormat = SimpleDateFormat(pattern, Locale.getDefault())
     val weatherState = viewModel.weatherState.value
     val currentDay = remember { mutableStateOf(Day.MORNING) }
     val transition = updateTransition(currentDay.value, label = "")
@@ -57,18 +63,21 @@ fun WeatherScreen(
                 .weight(3f)
                 .background(MaterialTheme.colors.surface),
         ) {
-            Text(
-                modifier = Modifier.padding(bottom = 12.dp),
-                text = "Today",
-                style = MaterialTheme.typography.h5,
-                fontWeight = FontWeight.SemiBold
-            )
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                items(weatherState.weather?.hourlyForecasts ?: emptyList()) { forecast ->
-                    ForecastListItem(forecast = forecast)
+            if (weatherState.weather != null) {
+                dateFormat.timeZone = TimeZone.getTimeZone(weatherState.weather.zoneId)
+                Text(
+                    modifier = Modifier.padding(bottom = 12.dp),
+                    text = "Today",
+                    style = MaterialTheme.typography.h5,
+                    fontWeight = FontWeight.SemiBold
+                )
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    items(weatherState.weather.hourlyForecasts) { forecast ->
+                        ForecastListItem(dateFormat = dateFormat, forecast = forecast)
+                    }
                 }
             }
         }

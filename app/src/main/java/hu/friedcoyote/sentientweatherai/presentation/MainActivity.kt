@@ -24,6 +24,7 @@ import hu.friedcoyote.sentientweatherai.presentation.ui.theme.SentientWeatherAIT
 import hu.friedcoyote.sentientweatherai.presentation.weather.WeatherScreen
 import hu.friedcoyote.sentientweatherai.presentation.weather.components.ForecastListItem
 import hu.friedcoyote.sentientweatherai.presentation.weather.components.Landscape
+import java.text.SimpleDateFormat
 import java.util.*
 
 @AndroidEntryPoint
@@ -45,14 +46,15 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun DefaultPreview() {
     SentientWeatherAITheme {
+        val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
         val currentDay = remember { mutableStateOf(Day.MORNING) }
         val transition = updateTransition(currentDay.value, label = "")
         val hourlyForecasts = listOf(
-            Forecast(Date(), "12:00", 18, 21, WeatherType.Clear, ""),
-            Forecast(Date(), "12:00", 18, 21, WeatherType.Tornado,""),
-            Forecast(Date(), "12:00",18, 21, WeatherType.Rain,""),
-            Forecast(Date(), "12:00",18, 21, WeatherType.Thunderstorm,""),
-            Forecast(Date(), "12:00",18, 21, WeatherType.Haze,"")
+            Forecast(Date(), 18, 21, WeatherType.Clear, ""),
+            Forecast(Date(), 18, 21, WeatherType.Tornado, ""),
+            Forecast(Date(), 18, 21, WeatherType.Rain, ""),
+            Forecast(Date(), 18, 21, WeatherType.Thunderstorm, ""),
+            Forecast(Date(), 18, 21, WeatherType.Haze, "")
         )
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
             Box(
@@ -93,7 +95,7 @@ fun DefaultPreview() {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     items(hourlyForecasts) { forecast ->
-                        ForecastListItem(forecast = forecast)
+                        ForecastListItem(dateFormat = dateFormat, forecast = forecast)
                     }
                 }
             }

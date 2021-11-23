@@ -2,7 +2,9 @@ package hu.friedcoyote.sentientweatherai.presentation.weather.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -12,14 +14,21 @@ import androidx.compose.ui.unit.dp
 import hu.friedcoyote.sentientweatherai.R
 import hu.friedcoyote.sentientweatherai.data.remote.dto.WeatherType
 import hu.friedcoyote.sentientweatherai.domain.model.Forecast
+import java.text.SimpleDateFormat
 
 @Composable
 fun ForecastListItem(
+    dateFormat: SimpleDateFormat,
     forecast: Forecast
 ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(modifier = Modifier.padding(bottom = 4.dp), text = forecast.timeLabel)
+    Column(modifier = Modifier.padding(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            modifier = Modifier.padding(bottom = 4.dp),
+            text = dateFormat.format(forecast.date),
+            style = MaterialTheme.typography.body2
+        )
         Icon(
+            modifier = Modifier.size(32.dp),
             painter = painterResource(
                 id = when (forecast.weatherType) {
                     WeatherType.Clear -> R.drawable.ic_clear_sky_day
@@ -41,6 +50,10 @@ fun ForecastListItem(
             ),
             contentDescription = forecast.description
         )
-        Text(modifier = Modifier.padding(top = 4.dp), text = "${forecast.temperatureCelsius}°")
+        Text(
+            modifier = Modifier.padding(top = 4.dp),
+            text = "${forecast.temperatureCelsius}°",
+            style = MaterialTheme.typography.body1
+        )
     }
 }
