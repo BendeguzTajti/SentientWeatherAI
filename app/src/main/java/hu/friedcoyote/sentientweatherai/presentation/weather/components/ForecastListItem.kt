@@ -13,6 +13,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import hu.friedcoyote.sentientweatherai.R
 import hu.friedcoyote.sentientweatherai.data.remote.dto.WeatherType
+import hu.friedcoyote.sentientweatherai.domain.model.DayType
 import hu.friedcoyote.sentientweatherai.domain.model.Forecast
 import java.text.SimpleDateFormat
 
@@ -31,7 +32,7 @@ fun ForecastListItem(
             modifier = Modifier.size(32.dp),
             painter = painterResource(
                 id = when (forecast.weatherType) {
-                    WeatherType.Clear -> R.drawable.ic_clear_sky_day
+                    WeatherType.Clear -> if (forecast.dayType == DayType.NIGHT) R.drawable.ic_clear_night else R.drawable.ic_clear_day
                     WeatherType.Clouds -> R.drawable.ic_cloud
                     WeatherType.Rain -> R.drawable.ic_rain
                     WeatherType.Thunderstorm -> R.drawable.ic_thunder
