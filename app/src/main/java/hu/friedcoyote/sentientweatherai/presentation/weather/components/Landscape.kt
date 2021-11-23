@@ -16,28 +16,28 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import hu.friedcoyote.sentientweatherai.R
-import hu.friedcoyote.sentientweatherai.domain.model.Day
+import hu.friedcoyote.sentientweatherai.domain.model.DayType
 
 @Composable
-fun Landscape(dayChangeTransition: Transition<Day>) {
+fun Landscape(dayChangeTransition: Transition<DayType>) {
     val skyColor = dayChangeTransition.animateColor(
         label = "skyColorAnimation",
         transitionSpec = { tween(400) }) {
         when (it) {
-            Day.MORNING -> Color(0xFFEFA093)
-            Day.AFTERNOON -> Color(0xFF52DCFF)
-            Day.NIGHT -> Color(0xFF6963B8)
+            DayType.MORNING -> Color(0xFFEFA093)
+            DayType.AFTERNOON -> Color(0xFF52DCFF)
+            DayType.NIGHT -> Color(0xFF6963B8)
         }
     }
     val afternoonLandscapeAlpha = dayChangeTransition.animateFloat(
         label = "afternoonLandscapeAlphaAnimation",
         transitionSpec = { tween(400) }) {
-        if (it == Day.AFTERNOON) 1f else 0f
+        if (it == DayType.AFTERNOON) 1f else 0f
     }
     val nightLandscapeAlpha = dayChangeTransition.animateFloat(
         label = "nightLandscapeAlphaAnimation",
         transitionSpec = { tween(400) }) {
-        if (it == Day.NIGHT) 1f else 0f
+        if (it == DayType.NIGHT) 1f else 0f
     }
     Box(
         modifier = Modifier

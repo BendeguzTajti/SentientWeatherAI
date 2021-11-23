@@ -18,7 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import hu.friedcoyote.sentientweatherai.domain.model.Day
+import hu.friedcoyote.sentientweatherai.domain.model.DayType
 import hu.friedcoyote.sentientweatherai.presentation.weather.components.ForecastListItem
 import hu.friedcoyote.sentientweatherai.presentation.weather.components.Landscape
 import java.text.SimpleDateFormat
@@ -31,7 +31,7 @@ fun WeatherScreen(
     val pattern = if (DateFormat.is24HourFormat(LocalContext.current)) "HH:mm" else "hh:mm"
     val dateFormat = SimpleDateFormat(pattern, Locale.getDefault())
     val weatherState = viewModel.weatherState.value
-    val currentDay = remember { mutableStateOf(Day.MORNING) }
+    val currentDay = remember { mutableStateOf(DayType.MORNING) }
     val transition = updateTransition(currentDay.value, label = "")
     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
         Box(

@@ -5,6 +5,7 @@ import java.util.*
 
 data class Forecast(
     val date: Date,
+    val dayType: DayType,
     val temperatureCelsius: Int,
     val temperatureFahrenheit: Int,
     val weatherType: WeatherType,
