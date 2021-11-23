@@ -14,13 +14,13 @@ import androidx.compose.ui.unit.dp
 import hu.friedcoyote.sentientweatherai.R
 import hu.friedcoyote.sentientweatherai.data.remote.dto.WeatherType
 import hu.friedcoyote.sentientweatherai.domain.model.DayType
-import hu.friedcoyote.sentientweatherai.domain.model.Forecast
+import hu.friedcoyote.sentientweatherai.domain.model.Weather
 import java.text.SimpleDateFormat
 
 @Composable
 fun ForecastListItem(
     dateFormat: SimpleDateFormat,
-    forecast: Forecast
+    forecast: Weather
 ) {
     Column(modifier = Modifier.padding(), horizontalAlignment = Alignment.CenterHorizontally) {
         Text(

@@ -9,8 +9,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,7 +16,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import hu.friedcoyote.sentientweatherai.domain.model.DayType
 import hu.friedcoyote.sentientweatherai.presentation.weather.components.ForecastListItem
 import hu.friedcoyote.sentientweatherai.presentation.weather.components.Landscape
 import java.text.SimpleDateFormat
@@ -31,8 +28,7 @@ fun WeatherScreen(
     val pattern = if (DateFormat.is24HourFormat(LocalContext.current)) "HH:mm" else "hh:mm"
     val dateFormat = SimpleDateFormat(pattern, Locale.getDefault())
     val weatherState = viewModel.weatherState.value
-    val currentDay = remember { mutableStateOf(DayType.MORNING) }
-    val transition = updateTransition(currentDay.value, label = "")
+    val transition = updateTransition(viewModel.dayType.value, label = "")
     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
         Box(
             modifier = Modifier
@@ -48,7 +44,7 @@ fun WeatherScreen(
                 if (weatherState.weather != null) {
                     Text(
                         modifier = Modifier.padding(top = 62.dp, start = 24.dp),
-                        text = "${weatherState.weather.temperatureCelsius}°",
+                        text = "${weatherState.weather.currentWeather?.temperatureCelsius}°",
                         color = Color.White,
                         style = MaterialTheme.typography.h1,
                         fontWeight = FontWeight.Bold

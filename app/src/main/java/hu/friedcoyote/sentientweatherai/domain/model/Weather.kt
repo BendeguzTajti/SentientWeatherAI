@@ -1,10 +1,13 @@
 package hu.friedcoyote.sentientweatherai.domain.model
 
+import hu.friedcoyote.sentientweatherai.data.remote.dto.WeatherType
+import java.util.*
+
 data class Weather(
-    val zoneId: String,
-    val temperatureCelsius: Int?,
-    val temperatureFahrenheit: Int?,
-    val description: String,
-    val hourlyForecasts: List<Forecast>,
-    val dailyForecasts: List<Forecast>
+    val date: Date,
+    val dayType: DayType,
+    val temperatureCelsius: Int,
+    val temperatureFahrenheit: Int,
+    val weatherType: WeatherType,
+    val description: String
 )

@@ -2,7 +2,7 @@ package hu.friedcoyote.sentientweatherai.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 import hu.friedcoyote.sentientweatherai.domain.model.DayType
-import hu.friedcoyote.sentientweatherai.domain.model.Forecast
+import hu.friedcoyote.sentientweatherai.domain.model.Weather
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
@@ -35,14 +35,14 @@ data class Daily(
     val windSpeed: Double
 )
 
-fun Daily.toForecast(hourFormat: SimpleDateFormat): Forecast {
+fun Daily.toForecast(hourFormat: SimpleDateFormat): Weather {
     val date = Date(dt * 1000)
     val dayType = when(hourFormat.format(date).toInt()) {
         in 4..9 -> DayType.MORNING
         in 10..17 -> DayType.AFTERNOON
         else -> DayType.NIGHT
     }
-    return Forecast(
+    return Weather(
         date = date,
         dayType = dayType,
         temperatureCelsius = (temp.day - 273.15).roundToInt(),

@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import dagger.hilt.android.AndroidEntryPoint
 import hu.friedcoyote.sentientweatherai.data.remote.dto.WeatherType
 import hu.friedcoyote.sentientweatherai.domain.model.DayType
-import hu.friedcoyote.sentientweatherai.domain.model.Forecast
+import hu.friedcoyote.sentientweatherai.domain.model.Weather
 import hu.friedcoyote.sentientweatherai.presentation.ui.theme.SentientWeatherAITheme
 import hu.friedcoyote.sentientweatherai.presentation.weather.WeatherScreen
 import hu.friedcoyote.sentientweatherai.presentation.weather.components.ForecastListItem
@@ -50,11 +50,11 @@ fun DefaultPreview() {
         val currentDay = remember { mutableStateOf(DayType.MORNING) }
         val transition = updateTransition(currentDay.value, label = "")
         val hourlyForecasts = listOf(
-            Forecast(Date(), DayType.MORNING,18, 21, WeatherType.Clear, ""),
-            Forecast(Date(), DayType.MORNING,18, 21, WeatherType.Tornado, ""),
-            Forecast(Date(), DayType.MORNING,18, 21, WeatherType.Rain, ""),
-            Forecast(Date(), DayType.MORNING,18, 21, WeatherType.Thunderstorm, ""),
-            Forecast(Date(), DayType.MORNING,18, 21, WeatherType.Haze, "")
+            Weather(Date(), DayType.MORNING,18, 21, WeatherType.Clear, ""),
+            Weather(Date(), DayType.MORNING,18, 21, WeatherType.Tornado, ""),
+            Weather(Date(), DayType.MORNING,18, 21, WeatherType.Rain, ""),
+            Weather(Date(), DayType.MORNING,18, 21, WeatherType.Thunderstorm, ""),
+            Weather(Date(), DayType.MORNING,18, 21, WeatherType.Haze, "")
         )
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
             Box(

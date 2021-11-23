@@ -2,7 +2,7 @@ package hu.friedcoyote.sentientweatherai.domain.use_case.get_current_weather
 
 import hu.friedcoyote.sentientweatherai.common.Resource
 import hu.friedcoyote.sentientweatherai.data.remote.dto.toWeather
-import hu.friedcoyote.sentientweatherai.domain.model.Weather
+import hu.friedcoyote.sentientweatherai.domain.model.WeatherContainer
 import hu.friedcoyote.sentientweatherai.domain.repository.WeatherRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -13,15 +13,15 @@ import javax.inject.Inject
 class GetCurrentWeatherUseCase @Inject constructor(
     private val repository: WeatherRepository
 ) {
-    operator fun invoke(lat: Double, lon: Double, exclude: List<String>?): Flow<Resource<Weather>> = flow {
+    operator fun invoke(lat: Double, lon: Double, exclude: List<String>?): Flow<Resource<WeatherContainer>> = flow {
         try {
-            emit(Resource.Loading<Weather>())
+            emit(Resource.Loading<WeatherContainer>())
             val weather = repository.getCurrentWeather(lat, lon, exclude)
-            emit(Resource.Success<Weather>(weather.toWeather()))
+            emit(Resource.Success<WeatherContainer>(weather.toWeather()))
         } catch (e: HttpException) {
-            emit(Resource.Error<Weather>("ERROR"))
+            emit(Resource.Error<WeatherContainer>("ERROR"))
         } catch (e: IOException) {
-            emit(Resource.Error<Weather>("ERROR"))
+            emit(Resource.Error<WeatherContainer>("ERROR"))
         }
     }
 }
