@@ -13,10 +13,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dagger.hilt.android.AndroidEntryPoint
+import hu.friedcoyote.sentientweatherai.R
 import hu.friedcoyote.sentientweatherai.data.remote.dto.WeatherType
 import hu.friedcoyote.sentientweatherai.domain.model.DayType
 import hu.friedcoyote.sentientweatherai.domain.model.Weather
@@ -42,7 +44,10 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(
+    showBackground = true,
+//    uiMode = UI_MODE_NIGHT_YES
+)
 @Composable
 fun DefaultPreview() {
     SentientWeatherAITheme {
@@ -50,21 +55,29 @@ fun DefaultPreview() {
         val currentDay = remember { mutableStateOf(DayType.MORNING) }
         val transition = updateTransition(currentDay.value, label = "")
         val hourlyForecasts = listOf(
-            Weather(Date(), DayType.MORNING,18, 21, WeatherType.Clear, ""),
-            Weather(Date(), DayType.MORNING,18, 21, WeatherType.Tornado, ""),
-            Weather(Date(), DayType.MORNING,18, 21, WeatherType.Rain, ""),
-            Weather(Date(), DayType.MORNING,18, 21, WeatherType.Thunderstorm, ""),
-            Weather(Date(), DayType.MORNING,18, 21, WeatherType.Haze, "")
+            Weather(Date(), DayType.MORNING, 18, 21, WeatherType.Clear, ""),
+            Weather(Date(), DayType.MORNING, 18, 21, WeatherType.Tornado, ""),
+            Weather(Date(), DayType.MORNING, 18, 21, WeatherType.Rain, ""),
+            Weather(Date(), DayType.MORNING, 18, 21, WeatherType.Thunderstorm, ""),
+            Weather(Date(), DayType.MORNING, 18, 21, WeatherType.Haze, "")
         )
-        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colors.surface),
+            verticalArrangement = Arrangement.Bottom
+        ) {
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .weight(6f), contentAlignment = Alignment.BottomCenter
+                    .weight(0.7f)
+                    .fillMaxSize(),
+                contentAlignment = Alignment.BottomCenter
             ) {
                 Landscape(dayChangeTransition = transition)
                 Row(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = 28.dp),
                     verticalAlignment = Alignment.Top,
                     horizontalArrangement = Arrangement.Center
                 ) {
@@ -76,19 +89,35 @@ fun DefaultPreview() {
                         fontWeight = FontWeight.Bold
                     )
                 }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 18.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    FloatingActionButton(
+                        onClick = { /*do something*/ },
+                        backgroundColor = MaterialTheme.colors.surface,
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_mic),
+                            contentDescription = "Localized description"
+                        )
+                    }
+                }
             }
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(12.dp)
-                    .weight(3f)
-                    .background(MaterialTheme.colors.surface),
+                    .weight(0.3f)
+                    .padding(start = 18.dp, end = 18.dp, bottom = 28.dp),
+                verticalArrangement = Arrangement.SpaceEvenly
             ) {
                 Text(
                     modifier = Modifier.padding(bottom = 12.dp),
                     text = "Today",
                     style = MaterialTheme.typography.h5,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colors.onSurface
                 )
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),

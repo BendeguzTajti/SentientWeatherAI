@@ -38,8 +38,8 @@ data class Daily(
 fun Daily.toForecast(hourFormat: SimpleDateFormat): Weather {
     val date = Date(dt * 1000)
     val dayType = when(hourFormat.format(date).toInt()) {
-        in 4..9 -> DayType.MORNING
-        in 10..17 -> DayType.AFTERNOON
+        in 6..11 -> DayType.MORNING
+        in 12..17 -> DayType.AFTERNOON
         else -> DayType.NIGHT
     }
     return Weather(

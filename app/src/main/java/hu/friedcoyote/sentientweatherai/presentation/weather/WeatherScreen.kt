@@ -6,6 +6,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -13,9 +15,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import hu.friedcoyote.sentientweatherai.R
 import hu.friedcoyote.sentientweatherai.presentation.weather.components.ForecastListItem
 import hu.friedcoyote.sentientweatherai.presentation.weather.components.Landscape
 import java.text.SimpleDateFormat
@@ -29,11 +33,16 @@ fun WeatherScreen(
     val dateFormat = SimpleDateFormat(pattern, Locale.getDefault())
     val weatherState = viewModel.weatherState.value
     val transition = updateTransition(viewModel.dayType.value, label = "")
-    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colors.surface),
+        verticalArrangement = Arrangement.Bottom
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .weight(6f), contentAlignment = Alignment.BottomCenter
+                .weight(0.7f), contentAlignment = Alignment.BottomCenter
         ) {
             Landscape(dayChangeTransition = transition)
             Column(
@@ -51,13 +60,28 @@ fun WeatherScreen(
                     )
                 }
             }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 18.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                FloatingActionButton(
+                    onClick = { /*do something*/ },
+                    backgroundColor = MaterialTheme.colors.surface
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_mic),
+                        contentDescription = "Localized description"
+                    )
+                }
+            }
         }
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp)
-                .weight(3f)
-                .background(MaterialTheme.colors.surface),
+                .weight(0.3f)
+                .padding(start = 18.dp, end = 18.dp, bottom = 28.dp),
+            verticalArrangement = Arrangement.SpaceEvenly
         ) {
             if (weatherState.weather != null) {
                 dateFormat.timeZone = TimeZone.getTimeZone(weatherState.weather.zoneId)

@@ -26,7 +26,8 @@ fun ForecastListItem(
         Text(
             modifier = Modifier.padding(bottom = 4.dp),
             text = dateFormat.format(forecast.date),
-            style = MaterialTheme.typography.body2
+            style = MaterialTheme.typography.body2,
+            color = MaterialTheme.colors.onSurface
         )
         Icon(
             modifier = Modifier.size(32.dp),
@@ -49,12 +50,14 @@ fun ForecastListItem(
                     WeatherType.Haze -> R.drawable.ic_haze
                 }
             ),
-            contentDescription = forecast.description
+            contentDescription = forecast.description,
+            tint = MaterialTheme.colors.onSurface
         )
         Text(
             modifier = Modifier.padding(top = 4.dp),
             text = "${forecast.temperatureCelsius}°",
-            style = MaterialTheme.typography.body1
+            style = MaterialTheme.typography.body1,
+            color = MaterialTheme.colors.onSurface
         )
     }
 }

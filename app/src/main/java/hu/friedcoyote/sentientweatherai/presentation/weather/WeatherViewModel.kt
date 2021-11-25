@@ -29,9 +29,9 @@ class WeatherViewModel @Inject constructor(
     }
 
     private fun getDayType(): DayType {
-        return when(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
-            in 4..9 -> DayType.MORNING
-            in 10..17 -> DayType.AFTERNOON
+        return when (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
+            in 6..11 -> DayType.MORNING
+            in 12..17 -> DayType.AFTERNOON
             else -> DayType.NIGHT
         }
     }
