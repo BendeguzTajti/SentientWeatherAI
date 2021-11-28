@@ -66,6 +66,9 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.17.0"
 
+    // Google Location and Activity Recognition
+    implementation 'com.google.android.gms:play-services-location:18.0.0'
+
     // Coroutines
     def coroutine_version = "1.5.1"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutine_version"

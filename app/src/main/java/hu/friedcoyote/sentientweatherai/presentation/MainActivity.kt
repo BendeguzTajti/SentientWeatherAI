@@ -35,10 +35,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             SentientWeatherAITheme {
-                // A surface container using the 'background' color from the theme
-                Surface(color = MaterialTheme.colors.background) {
-                    WeatherScreen()
-                }
+                WeatherScreen()
             }
         }
     }
@@ -109,7 +106,7 @@ fun DefaultPreview() {
             Column(
                 modifier = Modifier
                     .weight(0.3f)
-                    .padding(start = 18.dp, end = 18.dp, bottom = 28.dp),
+                    .padding(start = 18.dp, end = 18.dp),
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
                 Text(
@@ -127,6 +124,7 @@ fun DefaultPreview() {
                         ForecastListItem(dateFormat = dateFormat, forecast = forecast)
                     }
                 }
+                Spacer(modifier = Modifier.height(28.dp))
             }
         }
     }

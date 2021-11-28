@@ -7,15 +7,16 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.friedcoyote.sentientweatherai.common.Resource
 import hu.friedcoyote.sentientweatherai.domain.model.DayType
-import hu.friedcoyote.sentientweatherai.domain.use_case.get_current_weather.GetCurrentWeatherUseCase
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import hu.friedcoyote.sentientweatherai.domain.use_case.GetCurrentWeatherUseCase
+import hu.friedcoyote.sentientweatherai.domain.use_case.GetLocationByCityNameUseCase
+import kotlinx.coroutines.flow.*
 import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
 class WeatherViewModel @Inject constructor(
-    private val getCurrentWeatherUseCase: GetCurrentWeatherUseCase
+    private val getCurrentWeatherUseCase: GetCurrentWeatherUseCase,
+    private val getLocationByCityNameUseCase: GetLocationByCityNameUseCase
 ) : ViewModel() {
 
     private val _dayType = mutableStateOf(getDayType())
@@ -53,5 +54,33 @@ class WeatherViewModel @Inject constructor(
                 }
             }
         }.launchIn(viewModelScope)
+    }
+
+    fun getWeatherByCityName(cityName: String) {
+        getLocationByCityNameUseCase(cityName)
+            .catch {  }
+            .flatMapMerge { location ->
+                getCurrentWeatherUseCase(
+                    location.first,
+                    location.second,
+                    listOf("minutely")
+                )
+            }
+            .onEach { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        _weatherState.value = WeatherState(isLoading = true)
+                    }
+                    is Resource.Success -> {
+                        result.data?.currentWeather?.let {
+                            _dayType.value = it.dayType
+                        }
+                        _weatherState.value = WeatherState(weather = result.data)
+                    }
+                    is Resource.Error -> {
+
+                    }
+                }
+            }.launchIn(viewModelScope)
     }
 }

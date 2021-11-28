@@ -1,16 +1,19 @@
 package hu.friedcoyote.sentientweatherai.presentation.weather
 
+import android.app.Activity
+import android.content.Intent
+import android.speech.RecognizerIntent
 import android.text.format.DateFormat
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,75 +32,105 @@ import java.util.*
 fun WeatherScreen(
     viewModel: WeatherViewModel = hiltViewModel()
 ) {
+    val speechRecognizerLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
+            val recognizedWords =
+                result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+            if (result.resultCode == Activity.RESULT_OK && !recognizedWords.isNullOrEmpty()) {
+                viewModel.getWeatherByCityName(recognizedWords.first())
+            }
+        }
+    val scaffoldState = rememberScaffoldState()
+    val scope = rememberCoroutineScope()
     val pattern = if (DateFormat.is24HourFormat(LocalContext.current)) "HH:mm" else "hh:mm"
     val dateFormat = SimpleDateFormat(pattern, Locale.getDefault())
     val weatherState = viewModel.weatherState.value
-    val transition = updateTransition(viewModel.dayType.value, label = "")
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colors.surface),
-        verticalArrangement = Arrangement.Bottom
+    val transition = updateTransition(viewModel.dayType.value, label = "dayChangeTransition")
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        scaffoldState = scaffoldState
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(0.7f), contentAlignment = Alignment.BottomCenter
-        ) {
-            Landscape(dayChangeTransition = transition)
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                if (weatherState.weather != null) {
-                    Text(
-                        modifier = Modifier.padding(top = 62.dp, start = 24.dp),
-                        text = "${weatherState.weather.currentWeather?.temperatureCelsius}°",
-                        color = Color.White,
-                        style = MaterialTheme.typography.h1,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 18.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                FloatingActionButton(
-                    onClick = { /*do something*/ },
-                    backgroundColor = MaterialTheme.colors.surface
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_mic),
-                        contentDescription = "Localized description"
-                    )
-                }
-            }
-        }
         Column(
             modifier = Modifier
-                .weight(0.3f)
-                .padding(start = 18.dp, end = 18.dp, bottom = 28.dp),
-            verticalArrangement = Arrangement.SpaceEvenly
+                .fillMaxSize()
+                .background(MaterialTheme.colors.surface),
+            verticalArrangement = Arrangement.Bottom
         ) {
-            if (weatherState.weather != null) {
-                dateFormat.timeZone = TimeZone.getTimeZone(weatherState.weather.zoneId)
-                Text(
-                    modifier = Modifier.padding(bottom = 12.dp),
-                    text = "Today",
-                    style = MaterialTheme.typography.h5,
-                    fontWeight = FontWeight.SemiBold
-                )
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(0.7f),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                Landscape(dayChangeTransition = transition)
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    items(weatherState.weather.hourlyForecasts) { forecast ->
-                        ForecastListItem(dateFormat = dateFormat, forecast = forecast)
+                    if (weatherState.weather != null) {
+                        Text(
+                            modifier = Modifier.padding(top = 62.dp, start = 24.dp),
+                            text = "${weatherState.weather.currentWeather?.temperatureCelsius}°",
+                            color = Color.White,
+                            style = MaterialTheme.typography.h1,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 18.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    FloatingActionButton(
+                        onClick = {
+                            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                                putExtra(
+                                    RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                                )
+                                putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                                putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text")
+                            }
+                            speechRecognizerLauncher.launch(intent)
+                        },
+                        backgroundColor = MaterialTheme.colors.surface
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_mic),
+                            contentDescription = "Localized description"
+                        )
+                    }
+                }
+            }
+            Column(
+                modifier = Modifier
+                    .weight(0.3f)
+                    .padding(start = 18.dp, end = 18.dp),
+                verticalArrangement = Arrangement.SpaceEvenly
+            ) {
+                if (weatherState.weather != null) {
+                    dateFormat.timeZone = TimeZone.getTimeZone(weatherState.weather.zoneId)
+                    Text(
+                        modifier = Modifier.padding(bottom = 12.dp),
+                        text = "Today",
+                        style = MaterialTheme.typography.h5,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        items(weatherState.weather.hourlyForecasts) { forecast ->
+                            ForecastListItem(
+                                dateFormat = dateFormat,
+                                forecast = forecast
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(28.dp))
                 }
             }
         }

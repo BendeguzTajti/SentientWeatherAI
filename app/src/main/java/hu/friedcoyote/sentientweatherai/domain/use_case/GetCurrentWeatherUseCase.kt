@@ -1,4 +1,4 @@
-package hu.friedcoyote.sentientweatherai.domain.use_case.get_current_weather
+package hu.friedcoyote.sentientweatherai.domain.use_case
 
 import hu.friedcoyote.sentientweatherai.common.Resource
 import hu.friedcoyote.sentientweatherai.data.remote.dto.toWeather

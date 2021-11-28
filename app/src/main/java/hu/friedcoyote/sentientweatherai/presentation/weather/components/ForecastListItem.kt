@@ -1,8 +1,6 @@
 package hu.friedcoyote.sentientweatherai.presentation.weather.components
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -22,13 +20,13 @@ fun ForecastListItem(
     dateFormat: SimpleDateFormat,
     forecast: Weather
 ) {
-    Column(modifier = Modifier.padding(), horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            modifier = Modifier.padding(bottom = 4.dp),
             text = dateFormat.format(forecast.date),
             style = MaterialTheme.typography.body2,
             color = MaterialTheme.colors.onSurface
         )
+        Spacer(modifier = Modifier.height(4.dp))
         Icon(
             modifier = Modifier.size(32.dp),
             painter = painterResource(
@@ -53,8 +51,8 @@ fun ForecastListItem(
             contentDescription = forecast.description,
             tint = MaterialTheme.colors.onSurface
         )
+        Spacer(modifier = Modifier.height(4.dp))
         Text(
-            modifier = Modifier.padding(top = 4.dp),
             text = "${forecast.temperatureCelsius}°",
             style = MaterialTheme.typography.body1,
             color = MaterialTheme.colors.onSurface

@@ -1,8 +1,11 @@
 package hu.friedcoyote.sentientweatherai.di
 
+import android.content.Context
+import android.location.Geocoder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import hu.friedcoyote.sentientweatherai.common.Constants
 import hu.friedcoyote.sentientweatherai.data.remote.OpenWeatherApi
@@ -28,7 +31,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideWeatherRepository(api: OpenWeatherApi): WeatherRepository {
-        return WeatherRepositoryImpl(api)
+    fun provideWeatherRepository(api: OpenWeatherApi, geocoder: Geocoder): WeatherRepository {
+        return WeatherRepositoryImpl(api, geocoder)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGeocoder(@ApplicationContext appContext: Context): Geocoder {
+        return Geocoder(appContext)
     }
 }
