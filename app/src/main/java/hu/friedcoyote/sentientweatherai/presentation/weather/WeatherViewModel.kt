@@ -9,6 +9,7 @@ import hu.friedcoyote.sentientweatherai.common.Resource
 import hu.friedcoyote.sentientweatherai.domain.model.DayType
 import hu.friedcoyote.sentientweatherai.domain.use_case.GetCurrentWeatherUseCase
 import hu.friedcoyote.sentientweatherai.domain.use_case.GetLocationByCityNameUseCase
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import java.util.*
 import javax.inject.Inject
@@ -24,6 +25,9 @@ class WeatherViewModel @Inject constructor(
 
     private val _weatherState = mutableStateOf(WeatherState())
     val weatherState: State<WeatherState> = _weatherState
+
+    private val _searchError = MutableSharedFlow<Throwable?>()
+    val searchError: SharedFlow<Throwable?> = _searchError
 
     init {
         getWeather()
@@ -56,9 +60,10 @@ class WeatherViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
+    @FlowPreview
     fun getWeatherByCityName(cityName: String) {
         getLocationByCityNameUseCase(cityName)
-            .catch {  }
+            .catch { _searchError.emit(it) }
             .flatMapMerge { location ->
                 getCurrentWeatherUseCase(
                     location.first,
@@ -69,6 +74,7 @@ class WeatherViewModel @Inject constructor(
             .onEach { result ->
                 when (result) {
                     is Resource.Loading -> {
+                        _searchError.emit(null)
                         _weatherState.value = WeatherState(isLoading = true)
                     }
                     is Resource.Success -> {

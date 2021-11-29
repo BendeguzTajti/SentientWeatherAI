@@ -13,7 +13,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,9 +26,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import hu.friedcoyote.sentientweatherai.R
 import hu.friedcoyote.sentientweatherai.presentation.weather.components.ForecastListItem
 import hu.friedcoyote.sentientweatherai.presentation.weather.components.Landscape
+import kotlinx.coroutines.FlowPreview
 import java.text.SimpleDateFormat
 import java.util.*
 
+@FlowPreview
 @Composable
 fun WeatherScreen(
     viewModel: WeatherViewModel = hiltViewModel()
@@ -41,11 +44,19 @@ fun WeatherScreen(
             }
         }
     val scaffoldState = rememberScaffoldState()
-    val scope = rememberCoroutineScope()
     val pattern = if (DateFormat.is24HourFormat(LocalContext.current)) "HH:mm" else "hh:mm"
     val dateFormat = SimpleDateFormat(pattern, Locale.getDefault())
     val weatherState = viewModel.weatherState.value
     val transition = updateTransition(viewModel.dayType.value, label = "dayChangeTransition")
+    val searchError = viewModel.searchError.collectAsState(initial = null)
+    if (searchError.value != null) {
+        LaunchedEffect(searchError.value) {
+            scaffoldState.snackbarHostState.showSnackbar(
+                "No results found"
+            )
+        }
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         scaffoldState = scaffoldState
