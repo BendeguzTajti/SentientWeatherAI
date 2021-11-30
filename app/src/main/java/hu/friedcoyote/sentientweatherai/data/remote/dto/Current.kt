@@ -1,7 +1,7 @@
 package hu.friedcoyote.sentientweatherai.data.remote.dto
 
+import android.util.Log
 import com.google.gson.annotations.SerializedName
-import hu.friedcoyote.sentientweatherai.domain.model.DayType
 import hu.friedcoyote.sentientweatherai.domain.model.Weather
 import java.text.SimpleDateFormat
 import java.util.*
@@ -16,8 +16,8 @@ data class Current(
     val feelsLike: Double,
     val humidity: Int,
     val pressure: Int,
-    val sunrise: Int,
-    val sunset: Int,
+    val sunrise: Long,
+    val sunset: Long,
     val temp: Double,
     val uvi: Double,
     val visibility: Int,
@@ -32,14 +32,14 @@ data class Current(
 
 fun Current.toWeatherData(hourFormat: SimpleDateFormat): Weather {
     val date = Date(dt * 1000)
-    val dayType = when(hourFormat.format(date).toInt()) {
-        in 6..11 -> DayType.MORNING
-        in 12..17 -> DayType.AFTERNOON
-        else -> DayType.NIGHT
-    }
+    Log.d("KAKA", "toWeatherData: $date")
+    Log.d("KAKA", "toWeatherData: ${Date(sunrise * 1000)}")
+    Log.d("KAKA", "toWeatherData: ${Date(sunset * 1000)}")
+    val isNightTime = dt !in (sunrise + 1) until sunset
+    Log.d("KAKA", "toWeatherData: $isNightTime")
     return Weather(
         date = date,
-        dayType = dayType,
+        isNightTime = isNightTime,
         temperatureCelsius = (temp - 273.15).roundToInt(),
         temperatureFahrenheit = (((temp - 273.15) * 9 / 5) + 32).roundToInt(),
         weatherType = weather.first().main,

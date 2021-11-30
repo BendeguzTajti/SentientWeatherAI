@@ -5,7 +5,7 @@ import java.util.*
 
 data class Weather(
     val date: Date,
-    val dayType: DayType,
+    val isNightTime: Boolean = false,
     val temperatureCelsius: Int,
     val temperatureFahrenheit: Int,
     val weatherType: WeatherType,

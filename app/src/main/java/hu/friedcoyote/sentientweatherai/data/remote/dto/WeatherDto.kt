@@ -6,7 +6,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 data class WeatherDto(
-    val current: Current?,
+    val current: Current,
     val daily: List<Daily>?,
     val hourly: List<Hourly>?,
     val lat: Double,
@@ -23,9 +23,9 @@ fun WeatherDto.toWeather(): WeatherContainer {
     }
     return WeatherContainer(
         zoneId = timezone,
-        currentWeather = current?.toWeatherData(hourFormat),
+        currentWeather = current.toWeatherData(hourFormat),
         hourlyForecasts = hourly?.drop(1)?.filterIndexed { i, _ -> i % 2 == 0 }?.take(5)
-            ?.map { it.toForecast(hourFormat) } ?: emptyList(),
+            ?.map { it.toForecast(hourFormat, current.sunrise, current.sunset) } ?: emptyList(),
         dailyForecasts = daily?.drop(1)?.take(5)?.map { it.toForecast(hourFormat) } ?: emptyList()
     )
 }

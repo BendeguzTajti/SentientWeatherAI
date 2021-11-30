@@ -7,6 +7,7 @@ import android.text.format.DateFormat
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -30,6 +31,7 @@ import kotlinx.coroutines.FlowPreview
 import java.text.SimpleDateFormat
 import java.util.*
 
+@ExperimentalAnimationGraphicsApi
 @FlowPreview
 @Composable
 fun WeatherScreen(
@@ -47,7 +49,8 @@ fun WeatherScreen(
     val pattern = if (DateFormat.is24HourFormat(LocalContext.current)) "HH:mm" else "hh:mm"
     val dateFormat = SimpleDateFormat(pattern, Locale.getDefault())
     val weatherState = viewModel.weatherState.value
-    val transition = updateTransition(viewModel.dayType.value, label = "dayChangeTransition")
+    val isNightTime = viewModel.isNightTime
+    val dayChangeTransition = updateTransition(isNightTime.value, label = "dayChangeTransition")
     val searchError = viewModel.searchError.collectAsState(initial = null)
     if (searchError.value != null) {
         LaunchedEffect(searchError.value) {
@@ -73,7 +76,10 @@ fun WeatherScreen(
                     .weight(0.7f),
                 contentAlignment = Alignment.BottomCenter
             ) {
-                Landscape(dayChangeTransition = transition)
+                Landscape(
+                    dayChangeTransition = dayChangeTransition,
+                    isNightTime = isNightTime.value
+                )
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Top,

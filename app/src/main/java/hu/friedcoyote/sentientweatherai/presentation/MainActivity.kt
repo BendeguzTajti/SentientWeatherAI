@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -31,6 +32,7 @@ import java.util.*
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @ExperimentalAnimationGraphicsApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -41,6 +43,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@ExperimentalAnimationGraphicsApi
 @Preview(
     showBackground = true,
 //    uiMode = UI_MODE_NIGHT_YES
@@ -49,14 +52,14 @@ class MainActivity : ComponentActivity() {
 fun DefaultPreview() {
     SentientWeatherAITheme {
         val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-        val currentDay = remember { mutableStateOf(DayType.MORNING) }
-        val transition = updateTransition(currentDay.value, label = "")
+        val isNight = remember { mutableStateOf(false) }
+        val transition = updateTransition(isNight.value, label = "")
         val hourlyForecasts = listOf(
-            Weather(Date(), DayType.MORNING, 18, 21, WeatherType.Clear, ""),
-            Weather(Date(), DayType.MORNING, 18, 21, WeatherType.Tornado, ""),
-            Weather(Date(), DayType.MORNING, 18, 21, WeatherType.Rain, ""),
-            Weather(Date(), DayType.MORNING, 18, 21, WeatherType.Thunderstorm, ""),
-            Weather(Date(), DayType.MORNING, 18, 21, WeatherType.Haze, "")
+            Weather(Date(),false, 18, 21, WeatherType.Clear, ""),
+            Weather(Date(), false, 18, 21, WeatherType.Tornado, ""),
+            Weather(Date(), false, 18, 21, WeatherType.Rain, ""),
+            Weather(Date(), false, 18, 21, WeatherType.Thunderstorm, ""),
+            Weather(Date(), false, 18, 21, WeatherType.Haze, "")
         )
         Column(
             modifier = Modifier
@@ -70,7 +73,7 @@ fun DefaultPreview() {
                     .fillMaxSize(),
                 contentAlignment = Alignment.BottomCenter
             ) {
-                Landscape(dayChangeTransition = transition)
+                Landscape(dayChangeTransition = transition, isNightTime = false)
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
