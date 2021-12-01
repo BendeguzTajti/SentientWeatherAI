@@ -29,9 +29,15 @@ data class Hourly(
     val windSpeed: Double
 )
 
-fun Hourly.toForecast(hourFormat: SimpleDateFormat, sunset: Long, sunrise: Long): Weather {
+fun Hourly.toForecast(dateFormatter: SimpleDateFormat, currentDate: String, sunrise: Long, sunset: Long): Weather {
     val date = Date(dt * 1000)
-    val isNightTime = !(date.after(Date(sunrise * 1000)) && date.before(Date(sunset * 1000)))
+
+    val isNightTime = if (currentDate == dateFormatter.format(date)) {
+        dt !in (sunrise + 1) until sunset
+    } else {
+        !(dt > (sunrise + 86400) && dt < (sunset + 86400))
+    }
+
     return Weather(
         date = date,
         isNightTime = isNightTime,

@@ -1,9 +1,7 @@
 package hu.friedcoyote.sentientweatherai.data.remote.dto
 
-import android.util.Log
 import com.google.gson.annotations.SerializedName
 import hu.friedcoyote.sentientweatherai.domain.model.Weather
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -30,13 +28,9 @@ data class Current(
     val windSpeed: Double
 )
 
-fun Current.toWeatherData(hourFormat: SimpleDateFormat): Weather {
+fun Current.toWeatherData(): Weather {
     val date = Date(dt * 1000)
-    Log.d("KAKA", "toWeatherData: $date")
-    Log.d("KAKA", "toWeatherData: ${Date(sunrise * 1000)}")
-    Log.d("KAKA", "toWeatherData: ${Date(sunset * 1000)}")
     val isNightTime = dt !in (sunrise + 1) until sunset
-    Log.d("KAKA", "toWeatherData: $isNightTime")
     return Weather(
         date = date,
         isNightTime = isNightTime,

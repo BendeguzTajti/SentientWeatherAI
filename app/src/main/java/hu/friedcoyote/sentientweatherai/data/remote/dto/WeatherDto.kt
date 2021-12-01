@@ -18,14 +18,15 @@ data class WeatherDto(
 )
 
 fun WeatherDto.toWeather(): WeatherContainer {
-    val hourFormat = SimpleDateFormat("HH", Locale.getDefault()).apply {
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).apply {
         this.timeZone = TimeZone.getTimeZone(timezone)
     }
+    val currentDate = dateFormat.format(current.dt * 1000)
     return WeatherContainer(
         zoneId = timezone,
-        currentWeather = current.toWeatherData(hourFormat),
+        currentWeather = current.toWeatherData(),
         hourlyForecasts = hourly?.drop(1)?.filterIndexed { i, _ -> i % 2 == 0 }?.take(5)
-            ?.map { it.toForecast(hourFormat, current.sunrise, current.sunset) } ?: emptyList(),
-        dailyForecasts = daily?.drop(1)?.take(5)?.map { it.toForecast(hourFormat) } ?: emptyList()
+            ?.map { it.toForecast(dateFormat, currentDate, current.sunrise, current.sunset) } ?: emptyList(),
+        dailyForecasts = daily?.drop(1)?.take(5)?.map { it.toForecast() } ?: emptyList()
     )
 }
