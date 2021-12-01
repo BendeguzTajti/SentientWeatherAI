@@ -18,15 +18,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import hu.friedcoyote.sentientweatherai.R
+import hu.friedcoyote.sentientweatherai.domain.model.DayType
 
 @ExperimentalAnimationGraphicsApi
 @Composable
-fun Landscape(dayChangeTransition: Transition<Boolean>, isNightTime: Boolean) {
+fun Landscape(dayChangeTransition: Transition<DayType>, dayType: DayType) {
     val image = animatedVectorResource(id = R.drawable.landscape)
     val skyColor = dayChangeTransition.animateColor(
         label = "skyColorAnimation",
-        transitionSpec = { tween(400) }) { isNight ->
-        if (isNight) {
+        transitionSpec = { tween(400) }) { type ->
+        if (type == DayType.NIGHT) {
             Color(0xFF6963B8)
         } else {
             Color(0xFF52DCFF)
@@ -42,7 +43,7 @@ fun Landscape(dayChangeTransition: Transition<Boolean>, isNightTime: Boolean) {
         Image(
             modifier = Modifier
                 .fillMaxWidth(),
-            painter = image.painterFor(atEnd = isNightTime),
+            painter = image.painterFor(atEnd = dayType == DayType.NIGHT),
             contentDescription = null,
             contentScale = ContentScale.Crop,
         )

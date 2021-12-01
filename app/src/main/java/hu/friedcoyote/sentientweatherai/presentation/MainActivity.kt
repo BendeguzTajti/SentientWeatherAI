@@ -52,14 +52,14 @@ class MainActivity : ComponentActivity() {
 fun DefaultPreview() {
     SentientWeatherAITheme {
         val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-        val isNight = remember { mutableStateOf(false) }
+        val isNight = remember { mutableStateOf(DayType.DAY) }
         val transition = updateTransition(isNight.value, label = "")
         val hourlyForecasts = listOf(
-            Weather(Date(),false, 18, 21, WeatherType.Clear, ""),
-            Weather(Date(), false, 18, 21, WeatherType.Tornado, ""),
-            Weather(Date(), false, 18, 21, WeatherType.Rain, ""),
-            Weather(Date(), false, 18, 21, WeatherType.Thunderstorm, ""),
-            Weather(Date(), false, 18, 21, WeatherType.Haze, "")
+            Weather(Date(), DayType.DAY, 18, 21, WeatherType.Clear, ""),
+            Weather(Date(), DayType.DAY, 18, 21, WeatherType.Tornado, ""),
+            Weather(Date(), DayType.DAY, 18, 21, WeatherType.Rain, ""),
+            Weather(Date(), DayType.DAY, 18, 21, WeatherType.Thunderstorm, ""),
+            Weather(Date(), DayType.DAY, 18, 21, WeatherType.Haze, "")
         )
         Column(
             modifier = Modifier
@@ -73,7 +73,7 @@ fun DefaultPreview() {
                     .fillMaxSize(),
                 contentAlignment = Alignment.BottomCenter
             ) {
-                Landscape(dayChangeTransition = transition, isNightTime = false)
+                Landscape(dayChangeTransition = transition, dayType = DayType.DAY)
                 Row(
                     modifier = Modifier
                         .fillMaxSize()

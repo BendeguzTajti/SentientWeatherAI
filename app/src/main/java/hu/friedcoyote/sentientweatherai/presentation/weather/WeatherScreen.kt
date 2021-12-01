@@ -49,8 +49,8 @@ fun WeatherScreen(
     val pattern = if (DateFormat.is24HourFormat(LocalContext.current)) "HH:mm" else "hh:mm"
     val dateFormat = SimpleDateFormat(pattern, Locale.getDefault())
     val weatherState = viewModel.weatherState.value
-    val isNightTime = viewModel.isNightTime
-    val dayChangeTransition = updateTransition(isNightTime.value, label = "dayChangeTransition")
+    val dayType = viewModel.dayType
+    val dayChangeTransition = updateTransition(dayType.value, label = "dayChangeTransition")
     val searchError = viewModel.searchError.collectAsState(initial = null)
     if (searchError.value != null) {
         LaunchedEffect(searchError.value) {
@@ -78,7 +78,7 @@ fun WeatherScreen(
             ) {
                 Landscape(
                     dayChangeTransition = dayChangeTransition,
-                    isNightTime = isNightTime.value
+                    dayType = dayType.value
                 )
                 Column(
                     modifier = Modifier.fillMaxSize(),

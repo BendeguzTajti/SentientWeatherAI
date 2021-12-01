@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import hu.friedcoyote.sentientweatherai.R
-import hu.friedcoyote.sentientweatherai.data.remote.dto.WeatherType
+import hu.friedcoyote.sentientweatherai.domain.model.DayType
 import hu.friedcoyote.sentientweatherai.domain.model.Weather
 import java.text.SimpleDateFormat
 
@@ -29,7 +29,7 @@ fun ForecastListItem(
         Icon(
             modifier = Modifier.size(32.dp),
             painter = painterResource(
-                id = if (forecast.isNightTime) R.drawable.ic_clear_night else R.drawable.ic_clear_day
+                id = if (forecast.dayType == DayType.NIGHT) R.drawable.ic_clear_night else R.drawable.ic_clear_day
 //                when (forecast.weatherType) {
 //                    WeatherType.Clear -> if (forecast.isNightTime) R.drawable.ic_clear_night else R.drawable.ic_clear_day
 //                    WeatherType.Clouds -> R.drawable.ic_cloud

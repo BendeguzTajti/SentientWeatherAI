@@ -1,6 +1,7 @@
 package hu.friedcoyote.sentientweatherai.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
+import hu.friedcoyote.sentientweatherai.domain.model.DayType
 import hu.friedcoyote.sentientweatherai.domain.model.Weather
 import java.util.*
 import kotlin.math.roundToInt
@@ -30,10 +31,10 @@ data class Current(
 
 fun Current.toWeatherData(): Weather {
     val date = Date(dt * 1000)
-    val isNightTime = dt !in (sunrise + 1) until sunset
+    val dayType = if (dt !in (sunrise + 1) until sunset) DayType.NIGHT else DayType.DAY
     return Weather(
         date = date,
-        isNightTime = isNightTime,
+        dayType = dayType,
         temperatureCelsius = (temp - 273.15).roundToInt(),
         temperatureFahrenheit = (((temp - 273.15) * 9 / 5) + 32).roundToInt(),
         weatherType = weather.first().main,

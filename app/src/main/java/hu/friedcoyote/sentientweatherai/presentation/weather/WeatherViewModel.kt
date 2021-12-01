@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.friedcoyote.sentientweatherai.common.Resource
+import hu.friedcoyote.sentientweatherai.domain.model.DayType
 import hu.friedcoyote.sentientweatherai.domain.use_case.GetCurrentWeatherUseCase
 import hu.friedcoyote.sentientweatherai.domain.use_case.GetLocationByCityNameUseCase
 import kotlinx.coroutines.FlowPreview
@@ -18,8 +19,8 @@ class WeatherViewModel @Inject constructor(
     private val getLocationByCityNameUseCase: GetLocationByCityNameUseCase
 ) : ViewModel() {
 
-    private val _isNightTime = mutableStateOf(false)
-    val isNightTime: State<Boolean> = _isNightTime
+    private val _dayType = mutableStateOf(DayType.UNKNOWN)
+    val dayType: State<DayType> = _dayType
 
     private val _weatherState = mutableStateOf(WeatherState())
     val weatherState: State<WeatherState> = _weatherState
@@ -39,7 +40,7 @@ class WeatherViewModel @Inject constructor(
                 }
                 is Resource.Success -> {
                     result.data?.currentWeather?.let {
-                        _isNightTime.value = it.isNightTime
+                        _dayType.value = it.dayType
                     }
                     _weatherState.value = WeatherState(weather = result.data)
                 }
@@ -69,7 +70,7 @@ class WeatherViewModel @Inject constructor(
                     }
                     is Resource.Success -> {
                         result.data?.currentWeather?.let {
-                            _isNightTime.value = it.isNightTime
+                            _dayType.value = it.dayType
                         }
                         _weatherState.value = WeatherState(weather = result.data)
                     }
