@@ -19,7 +19,6 @@ import java.util.*
 
 @Composable
 fun WeatherAppBar(
-    backgroundColor: State<Color>,
     cityName: String,
     speechRecognizerLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>
 ) {
@@ -31,7 +30,7 @@ fun WeatherAppBar(
                 overflow = TextOverflow.Ellipsis
             )
         },
-        backgroundColor = backgroundColor.value,
+        backgroundColor = Color.Transparent,
         contentColor = Color.White,
         elevation = 0.dp,
         actions = {

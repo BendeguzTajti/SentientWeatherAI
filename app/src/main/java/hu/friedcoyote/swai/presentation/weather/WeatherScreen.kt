@@ -8,11 +8,12 @@ import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -59,12 +60,20 @@ fun WeatherScreen(
         darkIcons = false,
         isNavigationBarContrastEnforced = false
     )
+    val searchError = viewModel.searchError.collectAsState(initial = null)
+    if (searchError.value != null) {
+        LaunchedEffect(searchError.value) {
+            scaffoldState.snackbarHostState.showSnackbar(
+                "No results found"
+            )
+        }
+    }
 
     Scaffold(
         scaffoldState = scaffoldState,
+        backgroundColor = backgroundColor.value,
         topBar = {
             WeatherAppBar(
-                backgroundColor = backgroundColor,
                 cityName = "Budapest",
                 speechRecognizerLauncher = speechRecognizerLauncher
             )
@@ -75,14 +84,13 @@ fun WeatherScreen(
         ) {
             CurrentWeather(
                 modifier = Modifier
-                    .weight(7f)
-                    .fillMaxSize()
-                    .background(color = backgroundColor.value),
+                    .weight(.7f)
+                    .fillMaxSize(),
                 dayType = dayType.value
             )
             ForecastWeather(
                 modifier = Modifier
-                    .weight(3f)
+                    .weight(.3f)
                     .fillMaxSize(),
                 weatherState = weatherState.value
             )
