@@ -20,17 +20,24 @@ import java.util.*
 
 @Composable
 fun ForecastWeather(modifier: Modifier, weatherState: WeatherState) {
-    var tabRowState by remember { mutableStateOf(0) }
-    val titles = listOf("2 órás", "5 napos")
-    val pattern = if (DateFormat.is24HourFormat(LocalContext.current)) "HH:mm" else "hh:mm"
-    val hourFormatter = SimpleDateFormat(pattern, Locale.getDefault())
-    val dayFormatter = SimpleDateFormat("EEE", Locale.getDefault())
     Column(
         modifier = modifier,
     ) {
+        var tabRowState by remember { mutableStateOf(0) }
+        val titles = listOf("2 órás", "5 napos")
+        val context = LocalContext.current
+        val hourFormatter = remember {
+            val pattern = if (DateFormat.is24HourFormat(context)) "HH:mm" else "hh:mm"
+            SimpleDateFormat(pattern, Locale.getDefault())
+        }
+        val dayFormatter = remember {
+            SimpleDateFormat("EEE", Locale.getDefault())
+        }
         if (weatherState.weather != null) {
-            hourFormatter.timeZone = TimeZone.getTimeZone(weatherState.weather.zoneId)
-            dayFormatter.timeZone = TimeZone.getTimeZone(weatherState.weather.zoneId)
+            SideEffect {
+                hourFormatter.timeZone = TimeZone.getTimeZone(weatherState.weather.zoneId)
+                dayFormatter.timeZone = TimeZone.getTimeZone(weatherState.weather.zoneId)
+            }
         }
         TabRow(
             modifier = Modifier.fillMaxWidth(),
@@ -45,29 +52,29 @@ fun ForecastWeather(modifier: Modifier, weatherState: WeatherState) {
                 )
             }
         }
-        LazyRow(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colors.surface),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            contentPadding = PaddingValues(18.dp)
-        ) {
-            if (tabRowState == 0) {
-                items(weatherState.weather?.hourlyForecasts ?: emptyList()) { forecast ->
-                    ForecastListItem(
-                        dateFormatter = hourFormatter,
-                        forecast = forecast
-                    )
-                }
-            } else {
-                items(weatherState.weather?.dailyForecasts ?: emptyList()) { forecast ->
-                    ForecastListItem(
-                        dateFormatter = dayFormatter,
-                        forecast = forecast
-                    )
-                }
-            }
-        }
+//        LazyRow(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .background(MaterialTheme.colors.surface),
+//            horizontalArrangement = Arrangement.SpaceBetween,
+//            verticalAlignment = Alignment.CenterVertically,
+//            contentPadding = PaddingValues(18.dp)
+//        ) {
+//            if (tabRowState == 0) {
+//                items(weatherState.weather?.hourlyForecasts ?: emptyList()) { forecast ->
+//                    ForecastListItem(
+//                        dateFormatter = hourFormatter,
+//                        forecast = forecast
+//                    )
+//                }
+//            } else {
+//                items(weatherState.weather?.dailyForecasts ?: emptyList()) { forecast ->
+//                    ForecastListItem(
+//                        dateFormatter = dayFormatter,
+//                        forecast = forecast
+//                    )
+//                }
+//            }
+//        }
     }
 }

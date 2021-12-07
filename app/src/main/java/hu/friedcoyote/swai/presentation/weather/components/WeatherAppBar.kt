@@ -9,6 +9,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -18,10 +19,12 @@ import java.util.*
 
 @Composable
 fun WeatherAppBar(
+    modifier: Modifier,
     cityName: String,
     speechRecognizerLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>
 ) {
     TopAppBar(
+        modifier = modifier,
         title = {
             Text(
                 text = cityName,

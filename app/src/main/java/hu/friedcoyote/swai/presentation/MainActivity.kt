@@ -7,6 +7,7 @@ import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.view.WindowCompat
 import dagger.hilt.android.AndroidEntryPoint
 import hu.friedcoyote.swai.presentation.ui.theme.SWAITheme
 import hu.friedcoyote.swai.presentation.weather.WeatherScreen
@@ -18,6 +19,7 @@ import kotlinx.coroutines.FlowPreview
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             SWAITheme {
                 WeatherScreen()
