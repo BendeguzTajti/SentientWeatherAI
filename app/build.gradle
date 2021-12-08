@@ -21,9 +21,20 @@ android {
         }
     }
 
+    signingConfigs {
+        release {
+            storeFile file("../keyStore/keystore.jks")
+            storePassword "SWAI20211207"
+            keyAlias "key0"
+            keyPassword "SWAI20211207"
+        }
+    }
+
     buildTypes {
         release {
-            minifyEnabled false
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
