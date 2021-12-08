@@ -2,6 +2,7 @@ package hu.friedcoyote.swai.presentation.weather
 
 import android.app.Activity
 import android.speech.RecognizerIntent
+import android.text.format.DateFormat
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateColor
@@ -10,24 +11,29 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import hu.friedcoyote.swai.domain.model.DayType
 import hu.friedcoyote.swai.presentation.weather.components.CurrentWeather
-import hu.friedcoyote.swai.presentation.weather.components.ForecastWeather
+import hu.friedcoyote.swai.presentation.weather.components.ForecastListItem
 import hu.friedcoyote.swai.presentation.weather.components.WeatherAppBar
 import kotlinx.coroutines.FlowPreview
+import java.text.SimpleDateFormat
+import java.util.*
 
 @FlowPreview
 @ExperimentalAnimationGraphicsApi
@@ -62,6 +68,17 @@ fun WeatherScreen(
                 Color(0xFF87CEEB)
             }
         }
+        var tabRowState by remember { mutableStateOf(0) }
+        val titles = listOf("2 órás", "5 napos")
+//        val pattern = if (DateFormat.is24HourFormat(LocalContext.current)) "HH:mm" else "hh:mm"
+//        val hourFormatter = SimpleDateFormat(pattern, Locale.getDefault())
+        val dayFormatter = SimpleDateFormat("EEE", Locale.getDefault())
+//        if (weatherState.value.weather != null) {
+//            SideEffect {
+//                hourFormatter.timeZone = TimeZone.getTimeZone(weatherState.weather.zoneId)
+//                dayFormatter.timeZone = TimeZone.getTimeZone(weatherState.weather.zoneId)
+//            }
+//        }
         val searchError = viewModel.searchError.collectAsState(initial = null)
         if (searchError.value != null) {
             LaunchedEffect(searchError.value) {
@@ -81,22 +98,72 @@ fun WeatherScreen(
                 )
             }
         ) {
-            Column(
+            ConstraintLayout(
                 modifier = Modifier.fillMaxSize()
             ) {
+                val (currentWeatherContainer, tabRow, forecastWeather) = createRefs()
+                val guideline = createGuidelineFromBottom(0.25f)
                 CurrentWeather(
                     modifier = Modifier
-                        .weight(.7f)
-                        .fillMaxSize(),
+                        .constrainAs(currentWeatherContainer) {
+                            top.linkTo(parent.top)
+                            bottom.linkTo(tabRow.top)
+                            height = Dimension.fillToConstraints
+                        }
+                        .fillMaxWidth(),
                     dayType = dayType.value
                 )
-                ForecastWeather(
+
+                // TODO THIS DOESN'T LAG BY ITSELF
+                TabRow(
                     modifier = Modifier
-                        .weight(.3f)
+                        .constrainAs(tabRow) {
+                            bottom.linkTo(forecastWeather.top)
+                            height = Dimension.wrapContent
+                        }
+                        .fillMaxWidth(),
+                    selectedTabIndex = tabRowState,
+                    backgroundColor = MaterialTheme.colors.surface,
+                ) {
+                    titles.forEachIndexed { index, title ->
+                        Tab(
+                            text = { Text(title) },
+                            selected = tabRowState == index,
+                            onClick = {
+                                tabRowState = index
+                            }
+                        )
+                    }
+                }
+                LazyRow(
+                    modifier = Modifier
+                        .constrainAs(forecastWeather) {
+                            top.linkTo(guideline)
+                            bottom.linkTo(parent.bottom)
+                            height = Dimension.fillToConstraints
+                        }
                         .background(MaterialTheme.colors.surface)
-                        .fillMaxSize(),
-                    weatherState = weatherState.value
-                )
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    contentPadding = PaddingValues(18.dp)
+                ) {
+                    if (tabRowState == 0) {
+                        items(weatherState.value.weather?.hourlyForecasts ?: emptyList()) { forecast ->
+                            ForecastListItem(
+                                dateFormatter = SimpleDateFormat("hh:mm", Locale.getDefault()),
+                                forecast = forecast
+                            )
+                        }
+                    } else {
+                        items(weatherState.value.weather?.dailyForecasts ?: emptyList()) { forecast ->
+                            ForecastListItem(
+                                dateFormatter = SimpleDateFormat("EEE", Locale.getDefault()),
+                                forecast = forecast
+                            )
+                        }
+                    }
+                }
             }
         }
     }

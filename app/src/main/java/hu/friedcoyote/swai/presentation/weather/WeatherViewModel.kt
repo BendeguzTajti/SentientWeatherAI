@@ -10,6 +10,7 @@ import hu.friedcoyote.swai.domain.model.DayType
 import hu.friedcoyote.swai.domain.use_case.GetCurrentWeatherUseCase
 import hu.friedcoyote.swai.domain.use_case.GetLocationByCityNameUseCase
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
@@ -19,7 +20,7 @@ class WeatherViewModel @Inject constructor(
     private val getLocationByCityNameUseCase: GetLocationByCityNameUseCase
 ) : ViewModel() {
 
-    private val _dayType = mutableStateOf(DayType.UNKNOWN)
+    private val _dayType = mutableStateOf(DayType.DAY)
     val dayType: State<DayType> = _dayType
 
     private val _weatherState = mutableStateOf(WeatherState())

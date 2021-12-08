@@ -1,10 +1,12 @@
 package hu.friedcoyote.swai.data.remote.dto
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 import hu.friedcoyote.swai.domain.model.WeatherContainer
 import java.text.SimpleDateFormat
 import java.util.*
 
+@Keep
 data class WeatherDto(
     val current: Current,
     val daily: List<Daily>,

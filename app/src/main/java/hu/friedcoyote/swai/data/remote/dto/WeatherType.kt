@@ -1,5 +1,8 @@
 package hu.friedcoyote.swai.data.remote.dto
 
+import androidx.annotation.Keep
+
+@Keep
 enum class WeatherType {
     Thunderstorm,
     Drizzle,

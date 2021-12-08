@@ -1,7 +1,6 @@
 package hu.friedcoyote.swai.presentation.weather.components
 
 import android.text.format.DateFormat
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -48,33 +47,33 @@ fun ForecastWeather(modifier: Modifier, weatherState: WeatherState) {
                 Tab(
                     text = { Text(title) },
                     selected = tabRowState == index,
-                    onClick = { tabRowState = index }
+                    onClick = {
+                        tabRowState = index
+                    }
                 )
             }
         }
-//        LazyRow(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .background(MaterialTheme.colors.surface),
-//            horizontalArrangement = Arrangement.SpaceBetween,
-//            verticalAlignment = Alignment.CenterVertically,
-//            contentPadding = PaddingValues(18.dp)
-//        ) {
-//            if (tabRowState == 0) {
-//                items(weatherState.weather?.hourlyForecasts ?: emptyList()) { forecast ->
-//                    ForecastListItem(
-//                        dateFormatter = hourFormatter,
-//                        forecast = forecast
-//                    )
-//                }
-//            } else {
-//                items(weatherState.weather?.dailyForecasts ?: emptyList()) { forecast ->
-//                    ForecastListItem(
-//                        dateFormatter = dayFormatter,
-//                        forecast = forecast
-//                    )
-//                }
-//            }
-//        }
+        LazyRow(
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            contentPadding = PaddingValues(18.dp)
+        ) {
+            if (tabRowState == 0) {
+                items(weatherState.weather?.hourlyForecasts ?: emptyList()) { forecast ->
+                    ForecastListItem(
+                        dateFormatter = hourFormatter,
+                        forecast = forecast
+                    )
+                }
+            } else {
+                items(weatherState.weather?.dailyForecasts ?: emptyList()) { forecast ->
+                    ForecastListItem(
+                        dateFormatter = dayFormatter,
+                        forecast = forecast
+                    )
+                }
+            }
+        }
     }
 }

@@ -1,10 +1,12 @@
 package hu.friedcoyote.swai.data.remote.dto
 
+import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 import hu.friedcoyote.swai.domain.model.Weather
 import java.util.*
 import kotlin.math.roundToInt
 
+@Keep
 data class Daily(
     val clouds: Int,
     @SerializedName("dew_point")
