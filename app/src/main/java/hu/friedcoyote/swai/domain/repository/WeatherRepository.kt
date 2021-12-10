@@ -1,11 +1,17 @@
 package hu.friedcoyote.swai.domain.repository
 
 import android.location.Address
-import hu.friedcoyote.swai.data.remote.dto.WeatherDto
+import hu.friedcoyote.swai.common.Resource
+import hu.friedcoyote.swai.domain.model.WeatherContainer
+import kotlinx.coroutines.flow.Flow
 
 interface WeatherRepository {
 
-    suspend fun getCurrentWeather(lat: Double, lon: Double): WeatherDto
+    fun getWeatherByLocation(lat: Double, lon: Double): Flow<Resource<WeatherContainer>>
 
-    fun getLocationByCityName(cityName: String): List<Address>
+    fun getWeatherByCityName(cityName: String): Flow<Resource<WeatherContainer>>
+
+    fun getAddressByCityName(cityName: String): Address?
+
+    fun getAddressByLocation(lat: Double, lon: Double): Address
 }

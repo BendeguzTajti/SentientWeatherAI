@@ -11,6 +11,9 @@ import hu.friedcoyote.swai.common.Constants
 import hu.friedcoyote.swai.data.remote.OpenWeatherApi
 import hu.friedcoyote.swai.data.repository.WeatherRepositoryImpl
 import hu.friedcoyote.swai.domain.repository.WeatherRepository
+import hu.friedcoyote.swai.domain.use_case.GetWeatherByCityNameUseCase
+import hu.friedcoyote.swai.domain.use_case.GetWeatherByLocationUseCase
+import hu.friedcoyote.swai.domain.use_case.WeatherUseCases
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -39,5 +42,14 @@ object AppModule {
     @Singleton
     fun provideGeocoder(@ApplicationContext appContext: Context): Geocoder {
         return Geocoder(appContext)
+    }
+
+    @Provides
+    @Singleton
+    fun provideWeatherUseCases(repository: WeatherRepository): WeatherUseCases {
+        return WeatherUseCases(
+            getWeatherByLocationUseCase = GetWeatherByLocationUseCase(repository),
+            getWeatherByCityNameUseCase = GetWeatherByCityNameUseCase(repository)
+        )
     }
 }

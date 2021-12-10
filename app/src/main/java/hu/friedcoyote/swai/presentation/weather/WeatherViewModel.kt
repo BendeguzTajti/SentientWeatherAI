@@ -7,17 +7,14 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import hu.friedcoyote.swai.common.Resource
 import hu.friedcoyote.swai.domain.model.DayType
-import hu.friedcoyote.swai.domain.use_case.GetCurrentWeatherUseCase
-import hu.friedcoyote.swai.domain.use_case.GetLocationByCityNameUseCase
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
+import hu.friedcoyote.swai.domain.use_case.WeatherUseCases
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 @HiltViewModel
 class WeatherViewModel @Inject constructor(
-    private val getCurrentWeatherUseCase: GetCurrentWeatherUseCase,
-    private val getLocationByCityNameUseCase: GetLocationByCityNameUseCase
+    private val weatherUseCases: WeatherUseCases
 ) : ViewModel() {
 
     private val _dayType = mutableStateOf(DayType.DAY)
@@ -29,39 +26,41 @@ class WeatherViewModel @Inject constructor(
     private val _searchError = MutableSharedFlow<Throwable?>()
     val searchError: SharedFlow<Throwable?> = _searchError
 
+    private var getWeatherJob: Job? = null
+
     init {
         getWeather(47.4979, 19.0402)
     }
 
     private fun getWeather(lat: Double, lon: Double) {
-        getCurrentWeatherUseCase(lat, lon).onEach { result ->
-            when (result) {
-                is Resource.Loading -> {
-                    _weatherState.value = WeatherState(isLoading = true)
-                }
-                is Resource.Success -> {
-                    result.data?.currentWeather?.let {
-                        _dayType.value = it.dayType
+        getWeatherJob?.cancel()
+        getWeatherJob = weatherUseCases.getWeatherByLocationUseCase(lat, lon)
+            .onEach { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        _weatherState.value = WeatherState(isLoading = true)
                     }
-                    _weatherState.value = WeatherState(weather = result.data)
-                }
-                is Resource.Error -> {
-
+                    is Resource.Success -> {
+                        result.data?.currentWeather?.let {
+                            _dayType.value = it.dayType
+                        }
+                        _weatherState.value = WeatherState(
+                            cityName = result.data?.cityName ?: "",
+                            weather = result.data
+                        )
+                    }
+                    is Resource.Error -> {
+                        // TODO HANDLE ERROR
+                    }
                 }
             }
-        }.launchIn(viewModelScope)
+            .launchIn(viewModelScope)
     }
 
-    @FlowPreview
-    fun getWeatherByCityName(cityName: String) {
-        getLocationByCityNameUseCase(cityName)
-            .catch { _searchError.emit(it) }
-            .flatMapMerge { location ->
-                getCurrentWeatherUseCase(
-                    location.first,
-                    location.second
-                )
-            }
+
+    fun getWeather(cityName: String) {
+        getWeatherJob?.cancel()
+        getWeatherJob = weatherUseCases.getWeatherByCityNameUseCase(cityName)
             .onEach { result ->
                 when (result) {
                     is Resource.Loading -> {
@@ -72,12 +71,16 @@ class WeatherViewModel @Inject constructor(
                         result.data?.currentWeather?.let {
                             _dayType.value = it.dayType
                         }
-                        _weatherState.value = WeatherState(weather = result.data)
+                        _weatherState.value = WeatherState(
+                            cityName = result.data?.cityName ?: "",
+                            weather = result.data
+                        )
                     }
                     is Resource.Error -> {
-
+                        // TODO HANDLE ERROR
                     }
                 }
-            }.launchIn(viewModelScope)
+            }
+            .launchIn(viewModelScope)
     }
 }

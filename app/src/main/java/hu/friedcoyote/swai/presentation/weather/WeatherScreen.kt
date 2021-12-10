@@ -31,69 +31,66 @@ import hu.friedcoyote.swai.domain.model.DayType
 import hu.friedcoyote.swai.presentation.weather.components.CurrentWeather
 import hu.friedcoyote.swai.presentation.weather.components.ForecastListItem
 import hu.friedcoyote.swai.presentation.weather.components.WeatherAppBar
-import kotlinx.coroutines.FlowPreview
 import java.text.SimpleDateFormat
 import java.util.*
 
-@FlowPreview
 @ExperimentalAnimationGraphicsApi
 @Composable
 fun WeatherScreen(
     viewModel: WeatherViewModel = hiltViewModel()
 ) {
-    ProvideWindowInsets {
-        val statusBarPaddings =
-            rememberInsetsPaddingValues(insets = LocalWindowInsets.current.systemBars)
-        val scaffoldState = rememberScaffoldState()
-        val speechRecognizerLauncher =
-            rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
-                val recognizedWords =
-                    result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                if (result.resultCode == Activity.RESULT_OK && !recognizedWords.isNullOrEmpty()) {
-                    viewModel.getWeatherByCityName(recognizedWords.first())
-                }
-            }
-        val weatherState = viewModel.weatherState
-        val dayType = viewModel.dayType
-        val dayChangeTransition = updateTransition(
-            targetState = dayType.value,
-            label = "dayChangeTransition"
-        )
-        val backgroundColor = dayChangeTransition.animateColor(
-            label = "skyColorAnimation",
-            transitionSpec = { tween(durationMillis = 300, easing = LinearEasing) }) { type ->
-            if (type == DayType.NIGHT) {
-                Color(0xFF6963B8)
-            } else {
-                Color(0xFF87CEEB)
+    val scaffoldState = rememberScaffoldState()
+    val speechRecognizerLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
+            val recognizedWords =
+                result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+            if (result.resultCode == Activity.RESULT_OK && !recognizedWords.isNullOrEmpty()) {
+                viewModel.getWeather(recognizedWords.first())
             }
         }
-        var tabRowState by remember { mutableStateOf(0) }
-        val titles = listOf("2 órás", "5 napos")
-//        val pattern = if (DateFormat.is24HourFormat(LocalContext.current)) "HH:mm" else "hh:mm"
+    val weatherState = viewModel.weatherState
+    val dayType = viewModel.dayType
+    val dayChangeTransition = updateTransition(
+        targetState = dayType.value,
+        label = "dayChangeTransition"
+    )
+    val backgroundColor = dayChangeTransition.animateColor(
+        label = "skyColorAnimation",
+        transitionSpec = { tween(durationMillis = 300, easing = LinearEasing) }) { type ->
+        if (type == DayType.NIGHT) {
+            Color(0xFF6963B8)
+        } else {
+            Color(0xFF87CEEB)
+        }
+    }
+    var tabRowState by remember { mutableStateOf(0) }
+    val titles = listOf("2 órás", "5 napos")
+        val pattern = if (DateFormat.is24HourFormat(LocalContext.current)) "HH:mm" else "hh:mm"
 //        val hourFormatter = SimpleDateFormat(pattern, Locale.getDefault())
-        val dayFormatter = SimpleDateFormat("EEE", Locale.getDefault())
+//    val dayFormatter = SimpleDateFormat("EEE", Locale.getDefault())
 //        if (weatherState.value.weather != null) {
 //            SideEffect {
 //                hourFormatter.timeZone = TimeZone.getTimeZone(weatherState.weather.zoneId)
 //                dayFormatter.timeZone = TimeZone.getTimeZone(weatherState.weather.zoneId)
 //            }
 //        }
-        val searchError = viewModel.searchError.collectAsState(initial = null)
-        if (searchError.value != null) {
-            LaunchedEffect(searchError.value) {
-                scaffoldState.snackbarHostState.showSnackbar(
-                    "No results found"
-                )
-            }
+    val searchError = viewModel.searchError.collectAsState(initial = null)
+    if (searchError.value != null) {
+        LaunchedEffect(searchError.value) {
+            scaffoldState.snackbarHostState.showSnackbar(
+                "No results found"
+            )
         }
+    }
+    ProvideWindowInsets {
+        val statusBarPaddings = rememberInsetsPaddingValues(insets = LocalWindowInsets.current.systemBars)
         Scaffold(
             scaffoldState = scaffoldState,
             backgroundColor = backgroundColor.value,
             topBar = {
                 WeatherAppBar(
                     modifier = Modifier.padding(top = statusBarPaddings.calculateTopPadding()),
-                    cityName = "Budapest",
+                    cityName = weatherState.value.cityName,
                     speechRecognizerLauncher = speechRecognizerLauncher
                 )
             }
@@ -151,7 +148,7 @@ fun WeatherScreen(
                     if (tabRowState == 0) {
                         items(weatherState.value.weather?.hourlyForecasts ?: emptyList()) { forecast ->
                             ForecastListItem(
-                                dateFormatter = SimpleDateFormat("hh:mm", Locale.getDefault()),
+                                dateFormatter = SimpleDateFormat("HH:mm", Locale.getDefault()),
                                 forecast = forecast
                             )
                         }

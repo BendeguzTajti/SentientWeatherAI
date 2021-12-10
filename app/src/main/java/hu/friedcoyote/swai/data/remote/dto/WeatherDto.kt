@@ -18,13 +18,14 @@ data class WeatherDto(
     val timezoneOffset: Int
 )
 
-fun WeatherDto.toWeather(): WeatherContainer {
+fun WeatherDto.toWeather(cityName: String): WeatherContainer {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).apply {
         this.timeZone = TimeZone.getTimeZone(timezone)
     }
     val currentDate = dateFormat.format(current.dt * 1000)
     return WeatherContainer(
         zoneId = timezone,
+        cityName = cityName,
         currentWeather = current.toWeatherData(),
         hourlyForecasts = hourly.drop(1).filterIndexed { i, _ -> i % 2 == 0 }.take(5)
             .map { it.toForecast(dateFormat, currentDate, current.sunrise, current.sunset) },
