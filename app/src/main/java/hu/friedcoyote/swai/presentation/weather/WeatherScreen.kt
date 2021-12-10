@@ -110,8 +110,6 @@ fun WeatherScreen(
                         .fillMaxWidth(),
                     dayType = dayType.value
                 )
-
-                // TODO THIS DOESN'T LAG BY ITSELF
                 TabRow(
                     modifier = Modifier
                         .constrainAs(tabRow) {
@@ -146,14 +144,14 @@ fun WeatherScreen(
                     contentPadding = PaddingValues(18.dp)
                 ) {
                     if (tabRowState == 0) {
-                        items(weatherState.value.weather?.hourlyForecasts ?: emptyList()) { forecast ->
+                        items(weatherState.value.hourlyForecast) { forecast ->
                             ForecastListItem(
                                 dateFormatter = SimpleDateFormat("HH:mm", Locale.getDefault()),
                                 forecast = forecast
                             )
                         }
                     } else {
-                        items(weatherState.value.weather?.dailyForecasts ?: emptyList()) { forecast ->
+                        items(weatherState.value.dailyForecast) { forecast ->
                             ForecastListItem(
                                 dateFormatter = SimpleDateFormat("EEE", Locale.getDefault()),
                                 forecast = forecast

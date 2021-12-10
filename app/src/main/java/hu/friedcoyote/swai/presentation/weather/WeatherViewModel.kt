@@ -46,7 +46,9 @@ class WeatherViewModel @Inject constructor(
                         }
                         _weatherState.value = WeatherState(
                             cityName = result.data?.cityName ?: "",
-                            weather = result.data
+                            currentWeather = result.data?.currentWeather,
+                            hourlyForecast = result.data?.hourlyForecasts ?: emptyList(),
+                            dailyForecast = result.data?.dailyForecasts ?: emptyList()
                         )
                     }
                     is Resource.Error -> {
@@ -65,15 +67,20 @@ class WeatherViewModel @Inject constructor(
                 when (result) {
                     is Resource.Loading -> {
                         _searchError.emit(null)
-                        _weatherState.value = WeatherState(isLoading = true)
+                        _weatherState.value = weatherState.value.copy(
+                            isLoading = true
+                        )
                     }
                     is Resource.Success -> {
                         result.data?.currentWeather?.let {
                             _dayType.value = it.dayType
                         }
-                        _weatherState.value = WeatherState(
+                        _weatherState.value = weatherState.value.copy(
+                            isLoading = false,
                             cityName = result.data?.cityName ?: "",
-                            weather = result.data
+                            currentWeather = result.data?.currentWeather,
+                            hourlyForecast = result.data?.hourlyForecasts ?: emptyList(),
+                            dailyForecast = result.data?.dailyForecasts ?: emptyList()
                         )
                     }
                     is Resource.Error -> {

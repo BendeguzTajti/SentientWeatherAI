@@ -15,7 +15,7 @@ data class WeatherDto(
     val lon: Double,
     val timezone: String,
     @SerializedName("timezone_offset")
-    val timezoneOffset: Int
+    val timezoneOffset: Long
 )
 
 fun WeatherDto.toWeather(cityName: String): WeatherContainer {
