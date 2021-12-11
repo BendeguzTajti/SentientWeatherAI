@@ -4,8 +4,10 @@ import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 import hu.friedcoyote.swai.domain.model.DayType
 import hu.friedcoyote.swai.domain.model.Weather
-import java.text.SimpleDateFormat
-import java.util.*
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
 import kotlin.math.roundToInt
 
 @Keep
@@ -32,17 +34,16 @@ data class Hourly(
     val windSpeed: Double
 )
 
-fun Hourly.toForecast(dateFormatter: SimpleDateFormat, currentDate: String, sunrise: Long, sunset: Long): Weather {
-    val date = Date(dt * 1000)
-
-    val dayType = if (currentDate == dateFormatter.format(date)) {
+fun Hourly.toForecast(zoneId: ZoneId, currentDate: LocalDate, sunrise: Long, sunset: Long): Weather {
+    val instant = Instant.ofEpochSecond(dt)
+    val forecastDate = LocalDateTime.ofInstant(instant, zoneId)
+    val dayType = if (currentDate == forecastDate.toLocalDate()) {
         if (dt !in (sunrise + 1) until sunset) DayType.NIGHT else DayType.DAY
     } else {
         if (!(dt > (sunrise + 86400) && dt < (sunset + 86400))) DayType.NIGHT else DayType.DAY
     }
-
     return Weather(
-        date = date,
+        date = forecastDate,
         dayType = dayType,
         temperatureCelsius = (temp - 273.15).roundToInt(),
         temperatureFahrenheit = (((temp - 273.15) * 9 / 5) + 32).roundToInt(),

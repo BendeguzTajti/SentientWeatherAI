@@ -31,7 +31,7 @@ import hu.friedcoyote.swai.domain.model.DayType
 import hu.friedcoyote.swai.presentation.weather.components.CurrentWeather
 import hu.friedcoyote.swai.presentation.weather.components.ForecastListItem
 import hu.friedcoyote.swai.presentation.weather.components.WeatherAppBar
-import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 @ExperimentalAnimationGraphicsApi
@@ -65,15 +65,7 @@ fun WeatherScreen(
     }
     var tabRowState by remember { mutableStateOf(0) }
     val titles = listOf("2 órás", "5 napos")
-        val pattern = if (DateFormat.is24HourFormat(LocalContext.current)) "HH:mm" else "hh:mm"
-//        val hourFormatter = SimpleDateFormat(pattern, Locale.getDefault())
-//    val dayFormatter = SimpleDateFormat("EEE", Locale.getDefault())
-//        if (weatherState.value.weather != null) {
-//            SideEffect {
-//                hourFormatter.timeZone = TimeZone.getTimeZone(weatherState.weather.zoneId)
-//                dayFormatter.timeZone = TimeZone.getTimeZone(weatherState.weather.zoneId)
-//            }
-//        }
+    val pattern = if (DateFormat.is24HourFormat(LocalContext.current)) "HH:mm" else "hh:mm"
     val searchError = viewModel.searchError.collectAsState(initial = null)
     if (searchError.value != null) {
         LaunchedEffect(searchError.value) {
@@ -83,7 +75,8 @@ fun WeatherScreen(
         }
     }
     ProvideWindowInsets {
-        val statusBarPaddings = rememberInsetsPaddingValues(insets = LocalWindowInsets.current.systemBars)
+        val statusBarPaddings =
+            rememberInsetsPaddingValues(insets = LocalWindowInsets.current.systemBars)
         Scaffold(
             scaffoldState = scaffoldState,
             backgroundColor = backgroundColor.value,
@@ -144,16 +137,18 @@ fun WeatherScreen(
                     contentPadding = PaddingValues(18.dp)
                 ) {
                     if (tabRowState == 0) {
+                        val hourFormatter = DateTimeFormatter.ofPattern(pattern)
                         items(weatherState.value.hourlyForecast) { forecast ->
                             ForecastListItem(
-                                dateFormatter = SimpleDateFormat("HH:mm", Locale.getDefault()),
+                                dateFormatter = hourFormatter,
                                 forecast = forecast
                             )
                         }
                     } else {
+                        val dayFormatter = DateTimeFormatter.ofPattern("EEE", Locale.getDefault())
                         items(weatherState.value.dailyForecast) { forecast ->
                             ForecastListItem(
-                                dateFormatter = SimpleDateFormat("EEE", Locale.getDefault()),
+                                dateFormatter = dayFormatter,
                                 forecast = forecast
                             )
                         }

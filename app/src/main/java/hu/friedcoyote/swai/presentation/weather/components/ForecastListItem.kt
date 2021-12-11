@@ -8,16 +8,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import hu.friedcoyote.swai.data.remote.dto.WeatherType
 import hu.friedcoyote.swai.domain.model.DayType
 import hu.friedcoyote.swai.domain.model.Weather
-import java.text.SimpleDateFormat
 import hu.friedcoyote.swai.R
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun ForecastListItem(
-    dateFormatter: SimpleDateFormat,
+    dateFormatter: DateTimeFormatter,
     forecast: Weather
 ) {
     Column(
@@ -26,6 +27,7 @@ fun ForecastListItem(
     ) {
         Text(
             text = dateFormatter.format(forecast.date),
+            textAlign = TextAlign.Center,
             style = MaterialTheme.typography.body2,
             color = MaterialTheme.colors.onSurface
         )
@@ -56,8 +58,10 @@ fun ForecastListItem(
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
+            modifier = Modifier.padding(start = 4.dp),
             text = "${forecast.temperatureCelsius}°",
-            style = MaterialTheme.typography.body1,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.body2,
             color = MaterialTheme.colors.onSurface
         )
     }

@@ -3,8 +3,7 @@ package hu.friedcoyote.swai.data.remote.dto
 import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 import hu.friedcoyote.swai.domain.model.WeatherContainer
-import java.text.SimpleDateFormat
-import java.util.*
+import java.time.*
 
 @Keep
 data class WeatherDto(
@@ -19,16 +18,14 @@ data class WeatherDto(
 )
 
 fun WeatherDto.toWeather(cityName: String): WeatherContainer {
-    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).apply {
-        this.timeZone = TimeZone.getTimeZone(timezone)
-    }
-    val currentDate = dateFormat.format(current.dt * 1000)
+    val zoneId = ZoneId.of(timezone)
+    val instant = Instant.ofEpochSecond(current.dt)
+    val currentDate = LocalDateTime.ofInstant(instant, zoneId).toLocalDate()
     return WeatherContainer(
-        zoneId = timezone,
         cityName = cityName,
-        currentWeather = current.toWeatherData(),
+        currentWeather = current.toWeatherData(zoneId),
         hourlyForecasts = hourly.drop(1).filterIndexed { i, _ -> i % 2 == 0 }.take(5)
-            .map { it.toForecast(dateFormat, currentDate, current.sunrise, current.sunset) },
-        dailyForecasts = daily.drop(1).take(5).map { it.toForecast() }
+            .map { it.toForecast(zoneId, currentDate, current.sunrise, current.sunset) },
+        dailyForecasts = daily.drop(1).take(5).map { it.toForecast(zoneId) }
     )
 }

@@ -3,7 +3,9 @@ package hu.friedcoyote.swai.data.remote.dto
 import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 import hu.friedcoyote.swai.domain.model.Weather
-import java.util.*
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 import kotlin.math.roundToInt
 
 @Keep
@@ -35,10 +37,10 @@ data class Daily(
     val windSpeed: Double
 )
 
-fun Daily.toForecast(): Weather {
-    val date = Date(dt * 1000)
+fun Daily.toForecast(zoneId: ZoneId): Weather {
+    val instant = Instant.ofEpochSecond(dt)
     return Weather(
-        date = date,
+        date = LocalDateTime.ofInstant(instant, zoneId),
         temperatureCelsius = (temp.day - 273.15).roundToInt(),
         temperatureFahrenheit = (((temp.day - 273.15) * 9 / 5) + 32).roundToInt(),
         weatherType = weather.first().main,

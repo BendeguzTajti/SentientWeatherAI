@@ -1,11 +1,11 @@
 package hu.friedcoyote.swai.domain.model
 
 import hu.friedcoyote.swai.data.remote.dto.WeatherType
-import java.util.*
+import java.time.LocalDateTime
 
 data class Weather(
-    val date: Date,
-    val dayType: DayType = DayType.UNKNOWN,
+    val date: LocalDateTime,
+    val dayType: DayType = DayType.DAY,
     val temperatureCelsius: Int,
     val temperatureFahrenheit: Int,
     val weatherType: WeatherType,

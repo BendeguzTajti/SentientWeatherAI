@@ -4,7 +4,9 @@ import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 import hu.friedcoyote.swai.domain.model.DayType
 import hu.friedcoyote.swai.domain.model.Weather
-import java.util.*
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 import kotlin.math.roundToInt
 
 @Keep
@@ -31,11 +33,11 @@ data class Current(
     val windSpeed: Double
 )
 
-fun Current.toWeatherData(): Weather {
-    val date = Date(dt * 1000)
+fun Current.toWeatherData(zoneId: ZoneId): Weather {
+    val instant = Instant.ofEpochSecond(dt)
     val dayType = if (dt !in (sunrise + 1) until sunset) DayType.NIGHT else DayType.DAY
     return Weather(
-        date = date,
+        date = LocalDateTime.ofInstant(instant, zoneId),
         dayType = dayType,
         temperatureCelsius = (temp - 273.15).roundToInt(),
         temperatureFahrenheit = (((temp - 273.15) * 9 / 5) + 32).roundToInt(),
