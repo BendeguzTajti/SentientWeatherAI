@@ -9,9 +9,9 @@ interface WeatherRepository {
 
     fun getWeatherByLocation(lat: Double, lon: Double): Flow<Resource<WeatherContainer>>
 
-    fun getWeatherByCityName(cityName: String): Flow<Resource<WeatherContainer>>
+    fun getWeatherByCityName(cityNameInput: String): Flow<Resource<WeatherContainer>>
 
-    fun getAddressByCityName(cityName: String): Address?
+    fun getAddressByCityName(cityNameInput: String): Address?
 
     fun getAddressByLocation(lat: Double, lon: Double): Address
 }

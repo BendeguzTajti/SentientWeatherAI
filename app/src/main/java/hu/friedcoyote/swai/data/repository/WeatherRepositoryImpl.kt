@@ -34,7 +34,11 @@ class WeatherRepositoryImpl @Inject constructor(
                 Constants.APP_ID,
                 Locale.current.language
             )
-            emit(Resource.Success(weatherDto.toWeather(address.locality)))
+            emit(
+                Resource.Success(
+                    weatherDto.toWeather(address.locality ?: address.adminArea)
+                )
+            )
         } catch (e: HttpException) {
             emit(Resource.Error("Some Http error."))
         } catch (e: IOException) {
@@ -42,29 +46,31 @@ class WeatherRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getWeatherByCityName(cityName: String): Flow<Resource<WeatherContainer>> = flow {
-        emit(Resource.Loading())
-        try {
-            val address = getAddressByCityName(cityName)
-            address?.let {
-                val weatherDto = api.getCurrentWeather(
-                    it.latitude,
-                    it.longitude,
-                    "minutely",
-                    Constants.APP_ID,
-                    Locale.current.language
-                )
-                emit(Resource.Success(weatherDto.toWeather(it.locality)))
-            } ?: emit(Resource.Error("Invalid city name."))
-        } catch (e: HttpException) {
-            emit(Resource.Error("Some Http error."))
-        } catch (e: IOException) {
-            emit(Resource.Error("The server is currently unavailable."))
+    override fun getWeatherByCityName(cityNameInput: String): Flow<Resource<WeatherContainer>> =
+        flow {
+            emit(Resource.Loading())
+            try {
+                val address = getAddressByCityName(cityNameInput)
+                val cityName = address?.locality ?: address?.adminArea
+                if (address != null && cityName != null) {
+                    val weatherDto = api.getCurrentWeather(
+                        address.latitude,
+                        address.longitude,
+                        "minutely",
+                        Constants.APP_ID,
+                        Locale.current.language
+                    )
+                    emit(Resource.Success(weatherDto.toWeather(cityName)))
+                } else emit(Resource.Error("Invalid city name."))
+            } catch (e: HttpException) {
+                emit(Resource.Error("Some Http error."))
+            } catch (e: IOException) {
+                emit(Resource.Error("The server is currently unavailable."))
+            }
         }
-    }
 
-    override fun getAddressByCityName(cityName: String): Address? {
-        return geocoder.getFromLocationName(cityName, 1).firstOrNull()
+    override fun getAddressByCityName(cityNameInput: String): Address? {
+        return geocoder.getFromLocationName(cityNameInput, 1).firstOrNull()
     }
 
     override fun getAddressByLocation(lat: Double, lon: Double): Address {

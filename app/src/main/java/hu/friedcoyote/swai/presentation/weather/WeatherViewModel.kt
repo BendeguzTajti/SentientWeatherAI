@@ -23,8 +23,8 @@ class WeatherViewModel @Inject constructor(
     private val _weatherState = mutableStateOf(WeatherState())
     val weatherState: State<WeatherState> = _weatherState
 
-    private val _searchError = MutableSharedFlow<Throwable?>()
-    val searchError: SharedFlow<Throwable?> = _searchError
+    private val _searchError = MutableSharedFlow<String?>()
+    val searchError: SharedFlow<String?> = _searchError
 
     private var getWeatherJob: Job? = null
 
@@ -84,7 +84,7 @@ class WeatherViewModel @Inject constructor(
                         )
                     }
                     is Resource.Error -> {
-                        // TODO HANDLE ERROR
+                        _searchError.emit(result.message)
                     }
                 }
             }

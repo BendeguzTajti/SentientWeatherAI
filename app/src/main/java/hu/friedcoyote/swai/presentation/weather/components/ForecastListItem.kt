@@ -59,7 +59,7 @@ fun ForecastListItem(
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             modifier = Modifier.padding(start = 4.dp),
-            text = "${forecast.temperatureCelsius}°",
+            text = "${forecast.temperatureCelsius}°ᶜ",
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.body2,
             color = MaterialTheme.colors.onSurface
