@@ -100,8 +100,8 @@ fun WeatherScreen(
                             bottom.linkTo(tabRow.top)
                             height = Dimension.fillToConstraints
                         }
-                        .fillMaxWidth(),
-                    dayType = dayType.value
+                        .fillMaxSize(),
+                    currentWeather = weatherState.value.currentWeather
                 )
                 TabRow(
                     modifier = Modifier
@@ -134,7 +134,7 @@ fun WeatherScreen(
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
-                    contentPadding = PaddingValues(18.dp)
+                    contentPadding = PaddingValues(12.dp)
                 ) {
                     if (tabRowState == 0) {
                         val hourFormatter = DateTimeFormatter.ofPattern(pattern)

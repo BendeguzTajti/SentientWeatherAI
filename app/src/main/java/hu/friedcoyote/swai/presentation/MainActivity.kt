@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
@@ -17,8 +18,13 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.core.view.WindowCompat
 import dagger.hilt.android.AndroidEntryPoint
+import hu.friedcoyote.swai.data.remote.dto.WeatherType
+import hu.friedcoyote.swai.domain.model.DayType
+import hu.friedcoyote.swai.domain.model.Weather
 import hu.friedcoyote.swai.presentation.ui.theme.SWAITheme
 import hu.friedcoyote.swai.presentation.weather.WeatherScreen
+import hu.friedcoyote.swai.presentation.weather.components.CurrentWeather
+import java.time.LocalDateTime
 
 @ExperimentalAnimationGraphicsApi
 @AndroidEntryPoint
@@ -34,6 +40,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@ExperimentalAnimationGraphicsApi
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
@@ -41,13 +48,24 @@ fun DefaultPreview() {
         ConstraintLayout(modifier = Modifier.fillMaxSize()) {
             val (currentWeather, tabRow, forecastWeather) = createRefs()
             val guideline = createGuidelineFromBottom(0.2f)
-            Box(modifier = Modifier
-                .background(Color.Green)
-                .constrainAs(currentWeather) {
-                    top.linkTo(parent.top)
-                    bottom.linkTo(tabRow.top)
-                    height = Dimension.fillToConstraints
-                }.fillMaxWidth())
+            CurrentWeather(
+                modifier = Modifier
+                    .background(Color(0xFF6963B8))
+                    .constrainAs(currentWeather) {
+                        top.linkTo(parent.top)
+                        bottom.linkTo(tabRow.top)
+                        height = Dimension.fillToConstraints
+                    }
+                    .fillMaxSize(),
+                currentWeather = Weather(
+                    date = LocalDateTime.now(),
+                    dayType = DayType.NIGHT,
+                    temperatureCelsius = 22,
+                    temperatureFahrenheit = 90,
+                    weatherType = WeatherType.Clear,
+                    description = "Clear sky"
+                )
+            )
             Box(modifier = Modifier
                 .background(Color.Blue)
                 .constrainAs(tabRow) {
