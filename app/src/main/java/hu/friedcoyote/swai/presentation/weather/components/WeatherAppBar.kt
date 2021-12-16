@@ -36,6 +36,13 @@ fun WeatherAppBar(
         contentColor = Color.White,
         elevation = 0.dp,
         actions = {
+            IconButton(onClick = {}) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_search),
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            }
             IconButton(onClick = {
                 val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
                     putExtra(

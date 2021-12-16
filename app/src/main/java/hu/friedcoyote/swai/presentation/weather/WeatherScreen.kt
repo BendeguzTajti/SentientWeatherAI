@@ -60,7 +60,7 @@ fun WeatherScreen(
         if (type == DayType.NIGHT) {
             Color(0xFF6963B8)
         } else {
-            Color(0xFF87CEEB)
+            Color(0xFF65C2F5)
         }
     }
     var tabRowState by remember { mutableStateOf(0) }
@@ -92,24 +92,28 @@ fun WeatherScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 val (currentWeatherContainer, tabRow, forecastWeather) = createRefs()
-                val guideline = createGuidelineFromBottom(0.25f)
+                val guideline = createGuidelineFromBottom(0.23f)
                 CurrentWeather(
                     modifier = Modifier
                         .constrainAs(currentWeatherContainer) {
                             top.linkTo(parent.top)
                             bottom.linkTo(tabRow.top)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
                             height = Dimension.fillToConstraints
-                        }
-                        .fillMaxSize(),
+                            width = Dimension.fillToConstraints
+                        },
                     currentWeather = weatherState.value.currentWeather
                 )
                 TabRow(
                     modifier = Modifier
                         .constrainAs(tabRow) {
                             bottom.linkTo(forecastWeather.top)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
                             height = Dimension.wrapContent
-                        }
-                        .fillMaxWidth(),
+                            width = Dimension.fillToConstraints
+                        },
                     selectedTabIndex = tabRowState,
                     backgroundColor = MaterialTheme.colors.surface,
                 ) {
@@ -128,13 +132,15 @@ fun WeatherScreen(
                         .constrainAs(forecastWeather) {
                             top.linkTo(guideline)
                             bottom.linkTo(parent.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
                             height = Dimension.fillToConstraints
+                            width = Dimension.fillToConstraints
                         }
-                        .background(MaterialTheme.colors.surface)
-                        .fillMaxWidth(),
+                        .background(MaterialTheme.colors.surface),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
-                    contentPadding = PaddingValues(12.dp)
+                    contentPadding = PaddingValues(14.dp)
                 ) {
                     if (tabRowState == 0) {
                         val hourFormatter = DateTimeFormatter.ofPattern(pattern)

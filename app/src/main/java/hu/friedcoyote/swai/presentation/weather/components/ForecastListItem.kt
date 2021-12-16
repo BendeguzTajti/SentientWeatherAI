@@ -28,7 +28,7 @@ fun ForecastListItem(
         Text(
             text = dateFormatter.format(forecast.date),
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.body2,
+            style = MaterialTheme.typography.body1,
             color = MaterialTheme.colors.onSurface
         )
         Spacer(modifier = Modifier.height(4.dp))
@@ -61,7 +61,7 @@ fun ForecastListItem(
             modifier = Modifier.padding(start = 4.dp),
             text = "${forecast.temperatureCelsius}°ᶜ",
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.body2,
+            style = MaterialTheme.typography.body1,
             color = MaterialTheme.colors.onSurface
         )
     }

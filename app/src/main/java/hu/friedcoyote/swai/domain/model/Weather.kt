@@ -9,5 +9,10 @@ data class Weather(
     val temperatureCelsius: Int,
     val temperatureFahrenheit: Int,
     val weatherType: WeatherType,
-    val description: String
+    val description: String,
+    val windSpeed: Double,
+    val cloudsPercent: Int,
+    val humidityPercent: Int,
+    val rainPop: Double,
+    val snowPop: Double
 )

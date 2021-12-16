@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
@@ -54,16 +53,23 @@ fun DefaultPreview() {
                     .constrainAs(currentWeather) {
                         top.linkTo(parent.top)
                         bottom.linkTo(tabRow.top)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
                         height = Dimension.fillToConstraints
-                    }
-                    .fillMaxSize(),
+                        width = Dimension.fillToConstraints
+                    },
                 currentWeather = Weather(
                     date = LocalDateTime.now(),
                     dayType = DayType.NIGHT,
                     temperatureCelsius = 22,
                     temperatureFahrenheit = 90,
                     weatherType = WeatherType.Clear,
-                    description = "Clear sky"
+                    description = "Clear sky",
+                    windSpeed = 2.3,
+                    cloudsPercent = 86,
+                    humidityPercent = 90,
+                    rainPop = 0.25,
+                    snowPop = 0.0
                 )
             )
             Box(modifier = Modifier
