@@ -30,18 +30,26 @@ data class Current(
     @SerializedName("wind_gust")
     val windGust: Double,
     @SerializedName("wind_speed")
-    val windSpeed: Double
+    val windSpeed: Double,
+    val rain: Rain,
+    val snow: Snow,
 )
 
-fun Current.toWeatherData(zoneId: ZoneId): Weather {
+fun Current.toWeatherData(zoneId: ZoneId, rainPop: Double, snowPop: Double): Weather {
     val instant = Instant.ofEpochSecond(dt)
     val dayType = if (dt !in (sunrise + 1) until sunset) DayType.NIGHT else DayType.DAY
+    val windSpeedKmH = (windSpeed.times(3.6).times(100)).roundToInt().div(100.0)
     return Weather(
         date = LocalDateTime.ofInstant(instant, zoneId),
         dayType = dayType,
         temperatureCelsius = (temp - 273.15).roundToInt(),
         temperatureFahrenheit = (((temp - 273.15) * 9 / 5) + 32).roundToInt(),
         weatherType = weather.first().main,
-        description = weather.first().description
+        description = weather.first().description,
+        windSpeed = windSpeedKmH,
+        cloudsPercent = clouds,
+        humidityPercent = humidity,
+        rainPop = rainPop,
+        snowPop = snowPop
     )
 }

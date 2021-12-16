@@ -24,6 +24,7 @@ data class Daily(
     val pop: Double,
     val pressure: Int,
     val rain: Double,
+    val snow: Double,
     val sunrise: Int,
     val sunset: Int,
     val temp: Temp,
@@ -44,6 +45,11 @@ fun Daily.toForecast(zoneId: ZoneId): Weather {
         temperatureCelsius = (temp.day - 273.15).roundToInt(),
         temperatureFahrenheit = (((temp.day - 273.15) * 9 / 5) + 32).roundToInt(),
         weatherType = weather.first().main,
-        description = weather.first().description
+        description = weather.first().description,
+        windSpeed = windSpeed,
+        cloudsPercent = clouds,
+        humidityPercent = humidity,
+        rainPop = rain,
+        snowPop = snow
     )
 }

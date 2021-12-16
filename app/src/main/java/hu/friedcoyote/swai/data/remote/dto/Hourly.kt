@@ -21,7 +21,8 @@ data class Hourly(
     val humidity: Int,
     val pop: Double,
     val pressure: Int,
-    val rain: Rain,
+    val rain: Rain?,
+    val snow: Snow?,
     val temp: Double,
     val uvi: Double,
     val visibility: Int,
@@ -48,6 +49,11 @@ fun Hourly.toForecast(zoneId: ZoneId, currentDate: LocalDate, sunrise: Long, sun
         temperatureCelsius = (temp - 273.15).roundToInt(),
         temperatureFahrenheit = (((temp - 273.15) * 9 / 5) + 32).roundToInt(),
         weatherType = weather.first().main,
-        description = weather.first().description
+        description = weather.first().description,
+        windSpeed = windSpeed,
+        cloudsPercent = clouds,
+        humidityPercent = humidity,
+        rainPop = rain?.h ?: 0.0,
+        snowPop = snow?.h ?: 0.0
     )
 }
