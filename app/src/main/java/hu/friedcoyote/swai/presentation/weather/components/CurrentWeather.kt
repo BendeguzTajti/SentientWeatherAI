@@ -127,8 +127,10 @@ fun CurrentWeather(modifier: Modifier, currentWeather: Weather?) {
             modifier = Modifier
                 .constrainAs(landscape) {
                     bottom.linkTo(parent.bottom)
-                }
-                .fillMaxWidth(),
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    width = Dimension.fillToConstraints
+                },
             painter = image.painterFor(atEnd = currentWeather?.dayType == DayType.NIGHT),
             contentDescription = null,
             contentScale = ContentScale.Crop,

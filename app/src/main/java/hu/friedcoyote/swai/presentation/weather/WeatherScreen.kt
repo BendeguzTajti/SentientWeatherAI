@@ -1,6 +1,7 @@
 package hu.friedcoyote.swai.presentation.weather
 
 import android.app.Activity
+import android.content.Intent
 import android.speech.RecognizerIntent
 import android.text.format.DateFormat
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -14,12 +15,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
@@ -48,10 +56,10 @@ fun WeatherScreen(
                 viewModel.getWeather(recognizedWords.first())
             }
         }
-    val weatherState = viewModel.weatherState
-    val dayType = viewModel.dayType
+    val weatherState by viewModel.weatherState
+    val dayType by viewModel.dayType
     val dayChangeTransition = updateTransition(
-        targetState = dayType.value,
+        targetState = dayType,
         label = "dayChangeTransition"
     )
     val backgroundColor = dayChangeTransition.animateColor(
@@ -63,7 +71,7 @@ fun WeatherScreen(
             Color(0xFF65C2F5)
         }
     }
-    var tabRowState by remember { mutableStateOf(0) }
+    var tabRowState by rememberSaveable { mutableStateOf(0) }
     val titles = listOf("2 órás", "5 napos")
     val pattern = if (DateFormat.is24HourFormat(LocalContext.current)) "HH:mm" else "hh:mm"
     val searchError = viewModel.searchError.collectAsState(initial = null)
@@ -83,8 +91,18 @@ fun WeatherScreen(
             topBar = {
                 WeatherAppBar(
                     modifier = Modifier.padding(top = statusBarPaddings.calculateTopPadding()),
-                    cityName = weatherState.value.cityName,
-                    speechRecognizerLauncher = speechRecognizerLauncher
+                    cityName = weatherState.cityName,
+                    onMicClicked = {
+                        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                            putExtra(
+                                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                            )
+                            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                            putExtra(RecognizerIntent.EXTRA_PROMPT, "Say the name of the city")
+                        }
+                        speechRecognizerLauncher.launch(intent)
+                    }
                 )
             }
         ) {
@@ -103,7 +121,7 @@ fun WeatherScreen(
                             height = Dimension.fillToConstraints
                             width = Dimension.fillToConstraints
                         },
-                    currentWeather = weatherState.value.currentWeather
+                    currentWeather = weatherState.currentWeather
                 )
                 TabRow(
                     modifier = Modifier
@@ -144,7 +162,7 @@ fun WeatherScreen(
                 ) {
                     if (tabRowState == 0) {
                         val hourFormatter = DateTimeFormatter.ofPattern(pattern)
-                        items(weatherState.value.hourlyForecast) { forecast ->
+                        items(weatherState.hourlyForecast) { forecast ->
                             ForecastListItem(
                                 dateFormatter = hourFormatter,
                                 forecast = forecast
@@ -152,7 +170,7 @@ fun WeatherScreen(
                         }
                     } else {
                         val dayFormatter = DateTimeFormatter.ofPattern("EEE", Locale.getDefault())
-                        items(weatherState.value.dailyForecast) { forecast ->
+                        items(weatherState.dailyForecast) { forecast ->
                             ForecastListItem(
                                 dateFormatter = dayFormatter,
                                 forecast = forecast
