@@ -9,6 +9,7 @@ import hu.friedcoyote.swai.common.Resource
 import hu.friedcoyote.swai.domain.model.DayType
 import hu.friedcoyote.swai.domain.use_case.WeatherUseCases
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
@@ -60,7 +61,8 @@ class WeatherViewModel @Inject constructor(
     }
 
 
-    fun getWeather(cityName: String) {
+    fun getWeather(cityName: String, delayInMillis: Long) {
+        // TODO Mentsd el a korábbi városnevet és töltsd vissza ha hiba van és ne tölts ha ugyanaz a 2 városnév
         getWeatherJob?.cancel()
         getWeatherJob = weatherUseCases.getWeatherByCityNameUseCase(cityName)
             .onEach { result ->
@@ -68,8 +70,10 @@ class WeatherViewModel @Inject constructor(
                     is Resource.Loading -> {
                         _searchError.emit(null)
                         _weatherState.value = weatherState.value.copy(
-                            isLoading = true
+                            isLoading = true,
+                            cityName = cityName
                         )
+                        delay(delayInMillis)
                     }
                     is Resource.Success -> {
                         result.data?.currentWeather?.let {

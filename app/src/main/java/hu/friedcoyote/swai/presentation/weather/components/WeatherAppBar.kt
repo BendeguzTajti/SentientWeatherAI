@@ -15,6 +15,7 @@ import hu.friedcoyote.swai.R
 fun WeatherAppBar(
     modifier: Modifier,
     cityName: String,
+    onSearchClicked: () -> Unit,
     onMicClicked: () -> Unit,
 ) {
     TopAppBar(
@@ -31,7 +32,7 @@ fun WeatherAppBar(
         contentColor = Color.White,
         elevation = 0.dp,
         actions = {
-            IconButton(onClick = {}) {
+            IconButton(onClick = onSearchClicked) {
                 Icon(
                     imageVector = Icons.Rounded.Search,
                     contentDescription = null,

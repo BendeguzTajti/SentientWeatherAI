@@ -15,19 +15,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
@@ -38,7 +33,9 @@ import com.google.accompanist.insets.rememberInsetsPaddingValues
 import hu.friedcoyote.swai.domain.model.DayType
 import hu.friedcoyote.swai.presentation.weather.components.CurrentWeather
 import hu.friedcoyote.swai.presentation.weather.components.ForecastListItem
+import hu.friedcoyote.swai.presentation.weather.components.SearchAppBar
 import hu.friedcoyote.swai.presentation.weather.components.WeatherAppBar
+import hu.friedcoyote.swai.util.toCityName
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -53,7 +50,7 @@ fun WeatherScreen(
             val recognizedWords =
                 result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
             if (result.resultCode == Activity.RESULT_OK && !recognizedWords.isNullOrEmpty()) {
-                viewModel.getWeather(recognizedWords.first())
+                viewModel.getWeather(recognizedWords.first().toCityName(), 0)
             }
         }
     val weatherState by viewModel.weatherState
@@ -71,6 +68,10 @@ fun WeatherScreen(
             Color(0xFF65C2F5)
         }
     }
+    var searchWidgetState by rememberSaveable {
+        mutableStateOf(SearchWidgetState.CLOSED)
+    }
+    val focusRequester = remember { FocusRequester() }
     var tabRowState by rememberSaveable { mutableStateOf(0) }
     val titles = listOf("2 órás", "5 napos")
     val pattern = if (DateFormat.is24HourFormat(LocalContext.current)) "HH:mm" else "hh:mm"
@@ -89,21 +90,42 @@ fun WeatherScreen(
             scaffoldState = scaffoldState,
             backgroundColor = backgroundColor.value,
             topBar = {
-                WeatherAppBar(
-                    modifier = Modifier.padding(top = statusBarPaddings.calculateTopPadding()),
-                    cityName = weatherState.cityName,
-                    onMicClicked = {
-                        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                            putExtra(
-                                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-                            )
-                            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
-                            putExtra(RecognizerIntent.EXTRA_PROMPT, "Say the name of the city")
-                        }
-                        speechRecognizerLauncher.launch(intent)
+                when (searchWidgetState) {
+                    SearchWidgetState.OPENED -> {
+                        SearchAppBar(
+                            modifier = Modifier
+                                .padding(top = statusBarPaddings.calculateTopPadding())
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            onCloseClicked = { searchWidgetState = SearchWidgetState.CLOSED },
+                            onSearchClicked = {
+                                if (it.isNotBlank()) {
+                                    viewModel.getWeather(it, 500)
+                                }
+                                searchWidgetState = SearchWidgetState.CLOSED
+                            },
+                            focusRequester = focusRequester
+                        )
                     }
-                )
+                    SearchWidgetState.CLOSED -> {
+                        WeatherAppBar(
+                            modifier = Modifier.padding(top = statusBarPaddings.calculateTopPadding()),
+                            cityName = weatherState.cityName,
+                            onSearchClicked = { searchWidgetState = SearchWidgetState.OPENED },
+                            onMicClicked = {
+                                val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                                    putExtra(
+                                        RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                                    )
+                                    putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                                    putExtra(RecognizerIntent.EXTRA_PROMPT, "Say the name of the city")
+                                }
+                                speechRecognizerLauncher.launch(intent)
+                            }
+                        )
+                    }
+                }
             }
         ) {
             ConstraintLayout(
