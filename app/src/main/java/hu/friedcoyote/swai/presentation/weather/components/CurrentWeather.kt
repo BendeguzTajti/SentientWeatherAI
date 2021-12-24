@@ -2,6 +2,8 @@ package hu.friedcoyote.swai.presentation.weather.components
 
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
+import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
+import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
@@ -24,7 +26,6 @@ import hu.friedcoyote.swai.domain.model.Weather
 @ExperimentalAnimationGraphicsApi
 @Composable
 fun CurrentWeather(modifier: Modifier, currentWeather: Weather?) {
-    val image = animatedVectorResource(id = R.drawable.landscape)
     ConstraintLayout(
         modifier = modifier,
     ) {
@@ -123,6 +124,11 @@ fun CurrentWeather(modifier: Modifier, currentWeather: Weather?) {
                 )
             }
         }
+        val image = rememberAnimatedVectorPainter(
+            animatedImageVector = AnimatedImageVector.animatedVectorResource(
+                id = R.drawable.landscape
+            ),
+            atEnd = currentWeather?.dayType == DayType.NIGHT)
         Image(
             modifier = Modifier
                 .constrainAs(landscape) {
@@ -131,7 +137,7 @@ fun CurrentWeather(modifier: Modifier, currentWeather: Weather?) {
                     end.linkTo(parent.end)
                     width = Dimension.fillToConstraints
                 },
-            painter = image.painterFor(atEnd = currentWeather?.dayType == DayType.NIGHT),
+            painter = image,
             contentDescription = null,
             contentScale = ContentScale.Crop,
         )
