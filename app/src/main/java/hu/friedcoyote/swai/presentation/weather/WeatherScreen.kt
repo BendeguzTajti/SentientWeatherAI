@@ -143,7 +143,8 @@ fun WeatherScreen(
                             height = Dimension.fillToConstraints
                             width = Dimension.fillToConstraints
                         },
-                    currentWeather = weatherState.currentWeather
+                    currentWeather = weatherState.currentWeather,
+                    dayType = dayType
                 )
                 TabRow(
                     modifier = Modifier

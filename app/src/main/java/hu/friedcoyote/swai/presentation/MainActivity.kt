@@ -70,7 +70,8 @@ fun DefaultPreview() {
                     humidityPercent = 90,
                     rainPop = 0.25,
                     snowPop = 0.0
-                )
+                ),
+                dayType = DayType.NIGHT
             )
             Box(modifier = Modifier
                 .background(Color.Blue)

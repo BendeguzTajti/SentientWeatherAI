@@ -1,6 +1,7 @@
 package hu.friedcoyote.swai.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.location.Geocoder
 import dagger.Module
 import dagger.Provides
@@ -11,9 +12,7 @@ import hu.friedcoyote.swai.common.Constants
 import hu.friedcoyote.swai.data.remote.OpenWeatherApi
 import hu.friedcoyote.swai.data.repository.WeatherRepositoryImpl
 import hu.friedcoyote.swai.domain.repository.WeatherRepository
-import hu.friedcoyote.swai.domain.use_case.GetWeatherByCityNameUseCase
-import hu.friedcoyote.swai.domain.use_case.GetWeatherByLocationUseCase
-import hu.friedcoyote.swai.domain.use_case.WeatherUseCases
+import hu.friedcoyote.swai.domain.use_case.*
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -21,6 +20,12 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Provides
+    @Singleton
+    fun provideSharedPreferences(@ApplicationContext appContext: Context): SharedPreferences {
+        return appContext.getSharedPreferences(Constants.SHARED_PREF_NAME, Context.MODE_PRIVATE)
+    }
 
     @Provides
     @Singleton
@@ -34,8 +39,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideWeatherRepository(api: OpenWeatherApi, geocoder: Geocoder): WeatherRepository {
-        return WeatherRepositoryImpl(api, geocoder)
+    fun provideWeatherRepository(sharedPreferences: SharedPreferences, api: OpenWeatherApi, geocoder: Geocoder): WeatherRepository {
+        return WeatherRepositoryImpl(sharedPreferences, api, geocoder)
     }
 
     @Provides
@@ -49,7 +54,9 @@ object AppModule {
     fun provideWeatherUseCases(repository: WeatherRepository): WeatherUseCases {
         return WeatherUseCases(
             getWeatherByLocationUseCase = GetWeatherByLocationUseCase(repository),
-            getWeatherByCityNameUseCase = GetWeatherByCityNameUseCase(repository)
+            getWeatherByCityNameUseCase = GetWeatherByCityNameUseCase(repository),
+            getCachedDayTypeUseCase = GetCachedDayTypeUseCase(repository),
+            saveDayTypeUseCase = SaveDayTypeUseCase(repository)
         )
     }
 }

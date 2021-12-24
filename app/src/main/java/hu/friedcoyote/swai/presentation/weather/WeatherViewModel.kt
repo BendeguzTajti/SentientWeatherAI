@@ -18,7 +18,9 @@ class WeatherViewModel @Inject constructor(
     private val weatherUseCases: WeatherUseCases
 ) : ViewModel() {
 
-    private val _dayType = mutableStateOf(DayType.DAY)
+    private val _dayType = mutableStateOf(
+        weatherUseCases.getCachedDayTypeUseCase()
+    )
     val dayType: State<DayType> = _dayType
 
     private val _weatherState = mutableStateOf(WeatherState())
@@ -44,6 +46,7 @@ class WeatherViewModel @Inject constructor(
                     is Resource.Success -> {
                         result.data?.currentWeather?.let {
                             _dayType.value = it.dayType
+                            weatherUseCases.saveDayTypeUseCase(it.dayType)
                         }
                         _weatherState.value = WeatherState(
                             cityName = result.data?.cityName ?: "",

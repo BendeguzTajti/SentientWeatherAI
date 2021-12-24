@@ -1,12 +1,16 @@
 package hu.friedcoyote.swai.data.repository
 
+import android.content.SharedPreferences
 import android.location.Address
 import android.location.Geocoder
 import androidx.compose.ui.text.intl.Locale
+import androidx.core.content.edit
 import hu.friedcoyote.swai.common.Constants
+import hu.friedcoyote.swai.common.Constants.CACHED_DAY_TYPE_KEY
 import hu.friedcoyote.swai.common.Resource
 import hu.friedcoyote.swai.data.remote.OpenWeatherApi
 import hu.friedcoyote.swai.data.remote.dto.toWeather
+import hu.friedcoyote.swai.domain.model.DayType
 import hu.friedcoyote.swai.domain.model.WeatherContainer
 import hu.friedcoyote.swai.domain.repository.WeatherRepository
 import kotlinx.coroutines.flow.Flow
@@ -16,9 +20,21 @@ import java.io.IOException
 import javax.inject.Inject
 
 class WeatherRepositoryImpl @Inject constructor(
+    private val sharedPreferences: SharedPreferences,
     private val api: OpenWeatherApi,
     private val geocoder: Geocoder
 ) : WeatherRepository {
+
+    override fun getCachedDayType(): DayType {
+        val cachedDayType = sharedPreferences.getString(CACHED_DAY_TYPE_KEY, null)
+        return cachedDayType?.let { DayType.valueOf(it) } ?: DayType.DAY
+    }
+
+    override fun saveDayType(dayType: DayType) {
+        sharedPreferences.edit {
+            putString(CACHED_DAY_TYPE_KEY, dayType.name)
+        }
+    }
 
     override fun getWeatherByLocation(
         lat: Double,

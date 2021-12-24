@@ -25,7 +25,12 @@ import hu.friedcoyote.swai.domain.model.Weather
 
 @ExperimentalAnimationGraphicsApi
 @Composable
-fun CurrentWeather(modifier: Modifier, currentWeather: Weather?) {
+fun CurrentWeather(modifier: Modifier, currentWeather: Weather?, dayType: DayType) {
+    val image = rememberAnimatedVectorPainter(
+        animatedImageVector = AnimatedImageVector.animatedVectorResource(
+            id = R.drawable.landscape
+        ),
+        atEnd = dayType == DayType.NIGHT)
     ConstraintLayout(
         modifier = modifier,
     ) {
@@ -124,11 +129,6 @@ fun CurrentWeather(modifier: Modifier, currentWeather: Weather?) {
                 )
             }
         }
-        val image = rememberAnimatedVectorPainter(
-            animatedImageVector = AnimatedImageVector.animatedVectorResource(
-                id = R.drawable.landscape
-            ),
-            atEnd = currentWeather?.dayType == DayType.NIGHT)
         Image(
             modifier = Modifier
                 .constrainAs(landscape) {
