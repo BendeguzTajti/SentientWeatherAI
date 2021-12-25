@@ -31,11 +31,7 @@ import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import hu.friedcoyote.swai.domain.model.DayType
-import hu.friedcoyote.swai.presentation.weather.components.CurrentWeather
-import hu.friedcoyote.swai.presentation.weather.components.ForecastListItem
-import hu.friedcoyote.swai.presentation.weather.components.SearchAppBar
-import hu.friedcoyote.swai.presentation.weather.components.WeatherAppBar
-import hu.friedcoyote.swai.util.toCityName
+import hu.friedcoyote.swai.presentation.weather.components.*
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -50,7 +46,7 @@ fun WeatherScreen(
             val recognizedWords =
                 result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
             if (result.resultCode == Activity.RESULT_OK && !recognizedWords.isNullOrEmpty()) {
-                viewModel.getWeather(recognizedWords.first().toCityName(), 0)
+                viewModel.getWeather(recognizedWords.first(), 500)
             }
         }
     val weatherState by viewModel.weatherState
@@ -90,40 +86,48 @@ fun WeatherScreen(
             scaffoldState = scaffoldState,
             backgroundColor = backgroundColor.value,
             topBar = {
-                when (searchWidgetState) {
-                    SearchWidgetState.OPENED -> {
-                        SearchAppBar(
-                            modifier = Modifier
-                                .padding(top = statusBarPaddings.calculateTopPadding())
-                                .fillMaxWidth()
-                                .height(56.dp),
-                            onCloseClicked = { searchWidgetState = SearchWidgetState.CLOSED },
-                            onSearchClicked = {
-                                if (it.isNotBlank()) {
-                                    viewModel.getWeather(it, 500)
+                if (weatherState.isLoading) {
+                    LoadingAppBar(modifier = Modifier
+                        .padding(top = statusBarPaddings.calculateTopPadding())
+                        .fillMaxWidth()
+                        .height(56.dp)
+                    )
+                } else {
+                    when (searchWidgetState) {
+                        SearchWidgetState.OPENED -> {
+                            SearchAppBar(
+                                modifier = Modifier
+                                    .padding(top = statusBarPaddings.calculateTopPadding())
+                                    .fillMaxWidth()
+                                    .height(56.dp),
+                                onCloseClicked = { searchWidgetState = SearchWidgetState.CLOSED },
+                                onSearchClicked = {
+                                    if (it.isNotBlank()) {
+                                        viewModel.getWeather(it, 500)
+                                    }
+                                    searchWidgetState = SearchWidgetState.CLOSED
+                                },
+                                focusRequester = focusRequester
+                            )
+                        }
+                        SearchWidgetState.CLOSED -> {
+                            WeatherAppBar(
+                                modifier = Modifier.padding(top = statusBarPaddings.calculateTopPadding()),
+                                cityName = weatherState.cityName,
+                                onSearchClicked = { searchWidgetState = SearchWidgetState.OPENED },
+                                onMicClicked = {
+                                    val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                                        putExtra(
+                                            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                                            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                                        )
+                                        putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                                        putExtra(RecognizerIntent.EXTRA_PROMPT, "Say the name of the city")
+                                    }
+                                    speechRecognizerLauncher.launch(intent)
                                 }
-                                searchWidgetState = SearchWidgetState.CLOSED
-                            },
-                            focusRequester = focusRequester
-                        )
-                    }
-                    SearchWidgetState.CLOSED -> {
-                        WeatherAppBar(
-                            modifier = Modifier.padding(top = statusBarPaddings.calculateTopPadding()),
-                            cityName = weatherState.cityName,
-                            onSearchClicked = { searchWidgetState = SearchWidgetState.OPENED },
-                            onMicClicked = {
-                                val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                                    putExtra(
-                                        RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-                                    )
-                                    putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
-                                    putExtra(RecognizerIntent.EXTRA_PROMPT, "Say the name of the city")
-                                }
-                                speechRecognizerLauncher.launch(intent)
-                            }
-                        )
+                            )
+                        }
                     }
                 }
             }

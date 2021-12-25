@@ -65,7 +65,6 @@ class WeatherViewModel @Inject constructor(
 
 
     fun getWeather(cityName: String, delayInMillis: Long) {
-        // TODO Mentsd el a korábbi városnevet és töltsd vissza ha hiba van és ne tölts ha ugyanaz a 2 városnév
         getWeatherJob?.cancel()
         getWeatherJob = weatherUseCases.getWeatherByCityNameUseCase(cityName)
             .onEach { result ->
@@ -74,7 +73,6 @@ class WeatherViewModel @Inject constructor(
                         _searchError.emit(null)
                         _weatherState.value = weatherState.value.copy(
                             isLoading = true,
-                            cityName = cityName
                         )
                         delay(delayInMillis)
                     }
