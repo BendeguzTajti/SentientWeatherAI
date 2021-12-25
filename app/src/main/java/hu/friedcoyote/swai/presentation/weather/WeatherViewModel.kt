@@ -89,6 +89,9 @@ class WeatherViewModel @Inject constructor(
                         )
                     }
                     is Resource.Error -> {
+                        _weatherState.value = weatherState.value.copy(
+                            isLoading = false,
+                        )
                         _searchError.emit(result.message)
                     }
                 }
