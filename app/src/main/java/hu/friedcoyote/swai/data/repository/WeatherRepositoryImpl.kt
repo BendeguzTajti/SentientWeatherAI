@@ -5,6 +5,7 @@ import android.location.Address
 import android.location.Geocoder
 import androidx.compose.ui.text.intl.Locale
 import androidx.core.content.edit
+import hu.friedcoyote.swai.R
 import hu.friedcoyote.swai.common.Constants
 import hu.friedcoyote.swai.common.Constants.CACHED_DAY_TYPE_KEY
 import hu.friedcoyote.swai.common.Resource
@@ -56,9 +57,9 @@ class WeatherRepositoryImpl @Inject constructor(
                 )
             )
         } catch (e: HttpException) {
-            emit(Resource.Error("Some Http error."))
+//            emit(Resource.Error("Some Http error."))
         } catch (e: IOException) {
-            emit(Resource.Error("The server is currently unavailable"))
+//            emit(Resource.Error("The server is currently unavailable"))
         }
     }
 
@@ -77,11 +78,11 @@ class WeatherRepositoryImpl @Inject constructor(
                         Locale.current.language
                     )
                     emit(Resource.Success(weatherDto.toWeather(cityName)))
-                } else emit(Resource.Error("Invalid city name."))
+                } else emit(Resource.Error(R.string.no_results_found))
             } catch (e: HttpException) {
-                emit(Resource.Error("Some Http error."))
+//                emit(Resource.Error("Some Http error."))
             } catch (e: IOException) {
-                emit(Resource.Error("The server is currently unavailable."))
+//                emit(Resource.Error("The server is currently unavailable."))
             }
         }
 

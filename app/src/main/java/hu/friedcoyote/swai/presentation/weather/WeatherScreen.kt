@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
@@ -73,9 +74,10 @@ fun WeatherScreen(
     val pattern = if (DateFormat.is24HourFormat(LocalContext.current)) "HH:mm" else "hh:mm"
     val searchError = viewModel.searchError.collectAsState(initial = null)
     if (searchError.value != null) {
+        val message = stringResource(searchError.value!!)
         LaunchedEffect(searchError.value) {
             scaffoldState.snackbarHostState.showSnackbar(
-                "No results found"
+                message = message
             )
         }
     }
@@ -123,6 +125,7 @@ fun WeatherScreen(
                                         )
                                         putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
                                         putExtra(RecognizerIntent.EXTRA_PROMPT, "Say the name of the city")
+                                        putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
                                     }
                                     speechRecognizerLauncher.launch(intent)
                                 }

@@ -26,22 +26,23 @@ class WeatherViewModel @Inject constructor(
     private val _weatherState = mutableStateOf(WeatherState())
     val weatherState: State<WeatherState> = _weatherState
 
-    private val _searchError = MutableSharedFlow<String?>()
-    val searchError: SharedFlow<String?> = _searchError
+    private val _searchError = MutableSharedFlow<Int?>()
+    val searchError: SharedFlow<Int?> = _searchError
 
     private var getWeatherJob: Job? = null
 
     init {
-        getWeather(47.4979, 19.0402)
+        getWeather(47.4979, 19.0402, 500)
     }
 
-    private fun getWeather(lat: Double, lon: Double) {
+    private fun getWeather(lat: Double, lon: Double, delayInMillis: Long) {
         getWeatherJob?.cancel()
         getWeatherJob = weatherUseCases.getWeatherByLocationUseCase(lat, lon)
             .onEach { result ->
                 when (result) {
                     is Resource.Loading -> {
                         _weatherState.value = WeatherState(isLoading = true)
+                        delay(delayInMillis)
                     }
                     is Resource.Success -> {
                         result.data?.currentWeather?.let {
@@ -92,7 +93,7 @@ class WeatherViewModel @Inject constructor(
                         _weatherState.value = weatherState.value.copy(
                             isLoading = false,
                         )
-                        _searchError.emit(result.message)
+                        _searchError.emit(result.errorMessageResId)
                     }
                 }
             }
