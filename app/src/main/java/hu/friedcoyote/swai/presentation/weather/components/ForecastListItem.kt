@@ -1,5 +1,6 @@
 package hu.friedcoyote.swai.presentation.weather.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -18,6 +19,7 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun ForecastListItem(
+    orientation: Int,
     dateFormatter: DateTimeFormatter,
     forecast: Weather
 ) {
@@ -33,7 +35,9 @@ fun ForecastListItem(
         )
         Spacer(modifier = Modifier.height(4.dp))
         Icon(
-            modifier = Modifier.size(32.dp),
+            modifier = Modifier.size(
+                if (orientation == Configuration.ORIENTATION_LANDSCAPE) 24.dp else 32.dp
+            ),
             painter = painterResource(
                 id = when (forecast.weatherType) {
                     WeatherType.Clear -> if (forecast.dayType == DayType.NIGHT) R.drawable.ic_clear_night else R.drawable.ic_clear_day

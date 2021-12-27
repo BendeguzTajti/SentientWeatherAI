@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">SWAI</string>
     <string name="no_results_found">No results found</string>
+    <string-array name="forecast_types">
+        <item>Hourly</item>
+        <item>Daily</item>
+    </string-array>
 </resources>

@@ -1,5 +1,6 @@
 package hu.friedcoyote.swai.presentation
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -32,8 +34,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
+            val orientation = LocalConfiguration.current.orientation
             SWAITheme {
-                WeatherScreen()
+                WeatherScreen(
+                    orientation = orientation
+                )
             }
         }
     }
@@ -48,6 +53,7 @@ fun DefaultPreview() {
             val (currentWeather, tabRow, forecastWeather) = createRefs()
             val guideline = createGuidelineFromBottom(0.2f)
             CurrentWeather(
+                orientation = Configuration.ORIENTATION_PORTRAIT,
                 modifier = Modifier
                     .background(Color(0xFF6963B8))
                     .constrainAs(currentWeather) {

@@ -2,6 +2,7 @@ package hu.friedcoyote.swai.presentation.weather
 
 import android.app.Activity
 import android.content.Intent
+import android.content.res.Configuration
 import android.speech.RecognizerIntent
 import android.text.format.DateFormat
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -23,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -31,6 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
+import hu.friedcoyote.swai.R
 import hu.friedcoyote.swai.domain.model.DayType
 import hu.friedcoyote.swai.presentation.weather.components.*
 import java.time.format.DateTimeFormatter
@@ -39,6 +42,7 @@ import java.util.*
 @ExperimentalAnimationGraphicsApi
 @Composable
 fun WeatherScreen(
+    orientation: Int,
     viewModel: WeatherViewModel = hiltViewModel()
 ) {
     val scaffoldState = rememberScaffoldState()
@@ -70,7 +74,7 @@ fun WeatherScreen(
     }
     val focusRequester = remember { FocusRequester() }
     var tabRowState by rememberSaveable { mutableStateOf(0) }
-    val titles = listOf("2 órás", "5 napos")
+    val titles = stringArrayResource(id = R.array.forecast_types)
     val pattern = if (DateFormat.is24HourFormat(LocalContext.current)) "HH:mm" else "hh:mm"
     val searchError = viewModel.searchError.collectAsState(initial = null)
     if (searchError.value != null) {
@@ -89,10 +93,11 @@ fun WeatherScreen(
             backgroundColor = backgroundColor.value,
             topBar = {
                 if (weatherState.isLoading) {
-                    LoadingAppBar(modifier = Modifier
-                        .padding(top = statusBarPaddings.calculateTopPadding())
-                        .fillMaxWidth()
-                        .height(56.dp)
+                    LoadingAppBar(
+                        modifier = Modifier
+                            .padding(top = statusBarPaddings.calculateTopPadding())
+                            .fillMaxWidth()
+                            .height(56.dp)
                     )
                 } else {
                     when (searchWidgetState) {
@@ -118,15 +123,22 @@ fun WeatherScreen(
                                 cityName = weatherState.cityName,
                                 onSearchClicked = { searchWidgetState = SearchWidgetState.OPENED },
                                 onMicClicked = {
-                                    val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                                        putExtra(
-                                            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                                            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-                                        )
-                                        putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
-                                        putExtra(RecognizerIntent.EXTRA_PROMPT, "Say the name of the city")
-                                        putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
-                                    }
+                                    val intent =
+                                        Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                                            putExtra(
+                                                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                                                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                                            )
+                                            putExtra(
+                                                RecognizerIntent.EXTRA_LANGUAGE,
+                                                Locale.getDefault()
+                                            )
+                                            putExtra(
+                                                RecognizerIntent.EXTRA_PROMPT,
+                                                "Say the name of the city"
+                                            )
+                                            putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
+                                        }
                                     speechRecognizerLauncher.launch(intent)
                                 }
                             )
@@ -139,8 +151,11 @@ fun WeatherScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 val (currentWeatherContainer, tabRow, forecastWeather) = createRefs()
-                val guideline = createGuidelineFromBottom(0.23f)
+                val guideline = createGuidelineFromBottom(
+                    if (orientation == Configuration.ORIENTATION_LANDSCAPE) 0.35f else 0.23f
+                )
                 CurrentWeather(
+                    orientation = orientation,
                     modifier = Modifier
                         .constrainAs(currentWeatherContainer) {
                             top.linkTo(parent.top)
@@ -194,6 +209,7 @@ fun WeatherScreen(
                         val hourFormatter = DateTimeFormatter.ofPattern(pattern)
                         items(weatherState.hourlyForecast) { forecast ->
                             ForecastListItem(
+                                orientation = orientation,
                                 dateFormatter = hourFormatter,
                                 forecast = forecast
                             )
@@ -202,6 +218,7 @@ fun WeatherScreen(
                         val dayFormatter = DateTimeFormatter.ofPattern("EEE", Locale.getDefault())
                         items(weatherState.dailyForecast) { forecast ->
                             ForecastListItem(
+                                orientation = orientation,
                                 dateFormatter = dayFormatter,
                                 forecast = forecast
                             )

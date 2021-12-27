@@ -1,5 +1,6 @@
 package hu.friedcoyote.swai.presentation.weather.components
 
+import android.content.res.Configuration
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
@@ -25,16 +26,22 @@ import hu.friedcoyote.swai.domain.model.Weather
 
 @ExperimentalAnimationGraphicsApi
 @Composable
-fun CurrentWeather(modifier: Modifier, currentWeather: Weather?, dayType: DayType) {
+fun CurrentWeather(
+    orientation: Int,
+    modifier: Modifier,
+    currentWeather: Weather?,
+    dayType: DayType
+) {
     val image = rememberAnimatedVectorPainter(
         animatedImageVector = AnimatedImageVector.animatedVectorResource(
             id = R.drawable.landscape
         ),
-        atEnd = dayType == DayType.NIGHT)
+        atEnd = dayType == DayType.NIGHT
+    )
     ConstraintLayout(
         modifier = modifier,
     ) {
-        val (temperature, description, windAndHumidity, cloudsAndPop, landscape) = createRefs()
+        val (temperature, description, windAndHumidity, cloudsAndPop) = createRefs()
         if (currentWeather != null) {
             Text(
                 modifier = Modifier.constrainAs(temperature) {
@@ -64,7 +71,9 @@ fun CurrentWeather(modifier: Modifier, currentWeather: Weather?, dayType: DayTyp
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Icon(
-                    modifier = Modifier.size(32.dp),
+                    modifier = Modifier.size(
+                        if (orientation == Configuration.ORIENTATION_LANDSCAPE) 24.dp else 32.dp
+                    ),
                     painter = painterResource(
                         id = if (currentWeather.snowPop > 0) R.drawable.ic_snow else R.drawable.ic_rain
                     ),
@@ -80,7 +89,9 @@ fun CurrentWeather(modifier: Modifier, currentWeather: Weather?, dayType: DayTyp
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Icon(
-                    modifier = Modifier.size(32.dp),
+                    modifier = Modifier.size(
+                        if (orientation == Configuration.ORIENTATION_LANDSCAPE) 24.dp else 32.dp
+                    ),
                     painter = painterResource(id = R.drawable.ic_squall),
                     contentDescription = null,
                     tint = Color.White
@@ -101,7 +112,9 @@ fun CurrentWeather(modifier: Modifier, currentWeather: Weather?, dayType: DayTyp
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Icon(
-                    modifier = Modifier.size(32.dp),
+                    modifier = Modifier.size(
+                        if (orientation == Configuration.ORIENTATION_LANDSCAPE) 24.dp else 32.dp
+                    ),
                     painter = painterResource(id = R.drawable.ic_cloud),
                     contentDescription = null,
                     tint = Color.White
@@ -115,7 +128,9 @@ fun CurrentWeather(modifier: Modifier, currentWeather: Weather?, dayType: DayTyp
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Icon(
-                    modifier = Modifier.size(32.dp),
+                    modifier = Modifier.size(
+                        if (orientation == Configuration.ORIENTATION_LANDSCAPE) 24.dp else 32.dp
+                    ),
                     painter = painterResource(id = R.drawable.ic_humidity),
                     contentDescription = null,
                     tint = Color.White
@@ -129,17 +144,20 @@ fun CurrentWeather(modifier: Modifier, currentWeather: Weather?, dayType: DayTyp
                 )
             }
         }
-        Image(
-            modifier = Modifier
-                .constrainAs(landscape) {
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    width = Dimension.fillToConstraints
-                },
-            painter = image,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-        )
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            val landscape = createRef()
+            Image(
+                modifier = Modifier
+                    .constrainAs(landscape) {
+                        bottom.linkTo(parent.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        width = Dimension.fillToConstraints
+                    },
+                painter = image,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+            )
+        }
     }
 }
