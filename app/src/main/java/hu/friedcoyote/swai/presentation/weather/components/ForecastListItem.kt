@@ -24,7 +24,7 @@ fun ForecastListItem(
     forecast: Weather
 ) {
     Column(
-        modifier = Modifier.width(50.dp),
+        modifier = Modifier.width(60.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(

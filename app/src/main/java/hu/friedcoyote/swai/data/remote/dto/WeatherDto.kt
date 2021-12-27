@@ -24,8 +24,13 @@ fun WeatherDto.toWeather(cityName: String): WeatherContainer {
     return WeatherContainer(
         cityName = cityName,
         currentWeather = current.toWeatherData(zoneId, daily[0].rain, daily[0].snow),
-        hourlyForecasts = hourly.drop(1).filterIndexed { i, _ -> i % 2 == 0 }.take(5)
+        hourlyForecasts = hourly
+            .drop(1)
+            .take(5)
             .map { it.toForecast(zoneId, currentDate, current.sunrise, current.sunset) },
-        dailyForecasts = daily.drop(1).take(5).map { it.toForecast(zoneId) }
+        dailyForecasts = daily
+            .drop(1)
+            .take(5)
+            .map { it.toForecast(zoneId) }
     )
 }

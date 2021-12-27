@@ -201,7 +201,7 @@ fun WeatherScreen(
                             width = Dimension.fillToConstraints
                         }
                         .background(MaterialTheme.colors.surface),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.SpaceAround,
                     verticalAlignment = Alignment.CenterVertically,
                     contentPadding = PaddingValues(14.dp)
                 ) {
