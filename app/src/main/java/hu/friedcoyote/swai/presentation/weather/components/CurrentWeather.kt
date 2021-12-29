@@ -84,7 +84,7 @@ fun CurrentWeather(
                 Text(
                     text = "${if (currentWeather.snowPop > 0) currentWeather.snowPop else currentWeather.snowPop} mm",
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.body2,
+                    style = MaterialTheme.typography.caption,
                     color = Color.White
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -100,7 +100,7 @@ fun CurrentWeather(
                 Text(
                     text = "${currentWeather.windSpeed} km/h",
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.body2,
+                    style = MaterialTheme.typography.caption,
                     color = Color.White
                 )
             }
@@ -123,7 +123,7 @@ fun CurrentWeather(
                 Text(
                     text = "${currentWeather.cloudsPercent}%",
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.body2,
+                    style = MaterialTheme.typography.caption,
                     color = Color.White
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -139,7 +139,7 @@ fun CurrentWeather(
                 Text(
                     text = "${currentWeather.humidityPercent}%",
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.body2,
+                    style = MaterialTheme.typography.caption,
                     color = Color.White
                 )
             }

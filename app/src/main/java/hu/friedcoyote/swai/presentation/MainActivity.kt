@@ -12,12 +12,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.core.view.WindowCompat
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.rememberInsetsPaddingValues
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import dagger.hilt.android.AndroidEntryPoint
 import hu.friedcoyote.swai.data.remote.dto.WeatherType
 import hu.friedcoyote.swai.domain.model.DayType
@@ -27,6 +30,7 @@ import hu.friedcoyote.swai.presentation.weather.WeatherScreen
 import hu.friedcoyote.swai.presentation.weather.components.CurrentWeather
 import java.time.LocalDateTime
 
+@ExperimentalPermissionsApi
 @ExperimentalAnimationGraphicsApi
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -34,11 +38,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
-            val orientation = LocalConfiguration.current.orientation
             SWAITheme {
-                WeatherScreen(
-                    orientation = orientation
-                )
+                ProvideWindowInsets {
+                    val statusBarPaddings = rememberInsetsPaddingValues(
+                        insets = LocalWindowInsets.current.systemBars
+                    )
+                    WeatherScreen(
+                        statusBarPaddings = statusBarPaddings
+                    )
+                }
             }
         }
     }

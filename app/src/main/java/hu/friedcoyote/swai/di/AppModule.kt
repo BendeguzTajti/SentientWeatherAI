@@ -3,6 +3,8 @@ package hu.friedcoyote.swai.di
 import android.content.Context
 import android.content.SharedPreferences
 import android.location.Geocoder
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,8 +15,10 @@ import hu.friedcoyote.swai.data.remote.OpenWeatherApi
 import hu.friedcoyote.swai.data.repository.WeatherRepositoryImpl
 import hu.friedcoyote.swai.domain.repository.WeatherRepository
 import hu.friedcoyote.swai.domain.use_case.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.*
 import javax.inject.Singleton
 
 @Module
@@ -37,16 +41,28 @@ object AppModule {
             .create(OpenWeatherApi::class.java)
     }
 
+    @ExperimentalCoroutinesApi
     @Provides
     @Singleton
-    fun provideWeatherRepository(sharedPreferences: SharedPreferences, api: OpenWeatherApi, geocoder: Geocoder): WeatherRepository {
-        return WeatherRepositoryImpl(sharedPreferences, api, geocoder)
+    fun provideWeatherRepository(
+        sharedPreferences: SharedPreferences,
+        api: OpenWeatherApi,
+        geocoder: Geocoder,
+        fusedLocationProviderClient: FusedLocationProviderClient
+    ): WeatherRepository {
+        return WeatherRepositoryImpl(sharedPreferences, api, geocoder, fusedLocationProviderClient)
     }
 
     @Provides
     @Singleton
     fun provideGeocoder(@ApplicationContext appContext: Context): Geocoder {
-        return Geocoder(appContext)
+        return Geocoder(appContext, Locale.getDefault())
+    }
+
+    @Provides
+    @Singleton
+    fun provideFusedLocationClient(@ApplicationContext appContext: Context): FusedLocationProviderClient {
+        return LocationServices.getFusedLocationProviderClient(appContext)
     }
 
     @Provides

@@ -9,6 +9,6 @@ import javax.inject.Inject
 class GetWeatherByLocationUseCase @Inject constructor(
     private val repository: WeatherRepository
 ) {
-    operator fun invoke(lat: Double, lon: Double): Flow<Resource<WeatherContainer>> =
-        repository.getWeatherByLocation(lat, lon)
+    operator fun invoke(): Flow<Resource<WeatherContainer>> =
+        repository.getWeatherByUserLocation()
 }

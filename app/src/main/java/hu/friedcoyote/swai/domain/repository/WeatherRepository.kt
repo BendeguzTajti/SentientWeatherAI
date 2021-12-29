@@ -12,7 +12,7 @@ interface WeatherRepository {
 
     fun saveDayType(dayType: DayType)
 
-    fun getWeatherByLocation(lat: Double, lon: Double): Flow<Resource<WeatherContainer>>
+    fun getWeatherByUserLocation(): Flow<Resource<WeatherContainer>>
 
     fun getWeatherByCityName(cityNameInput: String): Flow<Resource<WeatherContainer>>
 

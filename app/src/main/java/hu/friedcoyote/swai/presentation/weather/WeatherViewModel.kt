@@ -31,13 +31,15 @@ class WeatherViewModel @Inject constructor(
 
     private var getWeatherJob: Job? = null
 
-    init {
-        getWeather(47.4979, 19.0402, 500)
+    fun onLocationPermissionGranted() {
+        if (getWeatherJob == null) {
+            getWeather()
+        }
     }
 
-    private fun getWeather(lat: Double, lon: Double, delayInMillis: Long) {
+    private fun getWeather(delayInMillis: Long = 500) {
         getWeatherJob?.cancel()
-        getWeatherJob = weatherUseCases.getWeatherByLocationUseCase(lat, lon)
+        getWeatherJob = weatherUseCases.getWeatherByLocationUseCase()
             .onEach { result ->
                 when (result) {
                     is Resource.Loading -> {

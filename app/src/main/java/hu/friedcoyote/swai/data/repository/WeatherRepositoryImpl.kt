@@ -1,10 +1,12 @@
 package hu.friedcoyote.swai.data.repository
 
+import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import android.location.Address
 import android.location.Geocoder
 import androidx.compose.ui.text.intl.Locale
 import androidx.core.content.edit
+import com.google.android.gms.location.FusedLocationProviderClient
 import hu.friedcoyote.swai.R
 import hu.friedcoyote.swai.common.Constants
 import hu.friedcoyote.swai.common.Constants.CACHED_DAY_TYPE_KEY
@@ -14,16 +16,21 @@ import hu.friedcoyote.swai.data.remote.dto.toWeather
 import hu.friedcoyote.swai.domain.model.DayType
 import hu.friedcoyote.swai.domain.model.WeatherContainer
 import hu.friedcoyote.swai.domain.repository.WeatherRepository
+import hu.friedcoyote.swai.util.awaitLastLocation
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import java.io.IOException
+import java.net.UnknownHostException
 import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
 class WeatherRepositoryImpl @Inject constructor(
     private val sharedPreferences: SharedPreferences,
     private val api: OpenWeatherApi,
-    private val geocoder: Geocoder
+    private val geocoder: Geocoder,
+    private val fusedLocationProviderClient: FusedLocationProviderClient
 ) : WeatherRepository {
 
     override fun getCachedDayType(): DayType {
@@ -37,16 +44,15 @@ class WeatherRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getWeatherByLocation(
-        lat: Double,
-        lon: Double,
-    ): Flow<Resource<WeatherContainer>> = flow {
+    @SuppressLint("MissingPermission")
+    override fun getWeatherByUserLocation(): Flow<Resource<WeatherContainer>> = flow {
         emit(Resource.Loading())
         try {
-            val address = getAddressByLocation(lat, lon)
+            val location = fusedLocationProviderClient.awaitLastLocation()
+            val address = getAddressByLocation(location.latitude, location.longitude)
             val weatherDto = api.getCurrentWeather(
-                lat,
-                lon,
+                location.latitude,
+                location.longitude,
                 "minutely",
                 Constants.APP_ID,
                 Locale.current.language
@@ -57,9 +63,13 @@ class WeatherRepositoryImpl @Inject constructor(
                 )
             )
         } catch (e: HttpException) {
-//            emit(Resource.Error("Some Http error."))
+            emit(Resource.Error(R.string.server_error))
+        } catch (e: UnknownHostException) {
+            emit(Resource.Error(R.string.internet_error))
         } catch (e: IOException) {
-//            emit(Resource.Error("The server is currently unavailable"))
+            // This happens when geocoder fails
+            // Set the error message accordingly
+            emit(Resource.Error(R.string.internet_error))
         }
     }
 
@@ -80,9 +90,13 @@ class WeatherRepositoryImpl @Inject constructor(
                     emit(Resource.Success(weatherDto.toWeather(cityName)))
                 } else emit(Resource.Error(R.string.no_results_found))
             } catch (e: HttpException) {
-//                emit(Resource.Error("Some Http error."))
+                emit(Resource.Error(R.string.server_error))
+            } catch (e: UnknownHostException) {
+                emit(Resource.Error(R.string.internet_error))
             } catch (e: IOException) {
-//                emit(Resource.Error("The server is currently unavailable."))
+                // This happens when geocoder fails
+                // Set the error message accordingly
+                emit(Resource.Error(R.string.internet_error))
             }
         }
 

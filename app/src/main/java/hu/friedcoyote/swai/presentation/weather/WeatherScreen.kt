@@ -1,5 +1,6 @@
 package hu.friedcoyote.swai.presentation.weather
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.res.Configuration
@@ -23,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
@@ -30,21 +32,24 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.ProvideWindowInsets
-import com.google.accompanist.insets.rememberInsetsPaddingValues
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
 import hu.friedcoyote.swai.R
 import hu.friedcoyote.swai.domain.model.DayType
 import hu.friedcoyote.swai.presentation.weather.components.*
+import hu.friedcoyote.swai.util.isPermanentlyDenied
 import java.time.format.DateTimeFormatter
 import java.util.*
 
+@ExperimentalPermissionsApi
 @ExperimentalAnimationGraphicsApi
 @Composable
 fun WeatherScreen(
-    orientation: Int,
+    statusBarPaddings: PaddingValues,
     viewModel: WeatherViewModel = hiltViewModel()
 ) {
+    val activity = (LocalContext.current as? Activity)
+    val orientation = LocalConfiguration.current.orientation
     val scaffoldState = rememberScaffoldState()
     val speechRecognizerLauncher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
@@ -85,144 +90,194 @@ fun WeatherScreen(
             )
         }
     }
-    ProvideWindowInsets {
-        val statusBarPaddings =
-            rememberInsetsPaddingValues(insets = LocalWindowInsets.current.systemBars)
-        Scaffold(
-            scaffoldState = scaffoldState,
-            backgroundColor = backgroundColor.value,
-            topBar = {
-                if (weatherState.isLoading) {
-                    LoadingAppBar(
-                        modifier = Modifier
-                            .padding(top = statusBarPaddings.calculateTopPadding())
-                            .fillMaxWidth()
-                            .height(56.dp)
-                    )
-                } else {
-                    when (searchWidgetState) {
-                        SearchWidgetState.OPENED -> {
-                            SearchAppBar(
-                                modifier = Modifier
-                                    .padding(top = statusBarPaddings.calculateTopPadding())
-                                    .fillMaxWidth()
-                                    .height(56.dp),
-                                onCloseClicked = { searchWidgetState = SearchWidgetState.CLOSED },
-                                onSearchClicked = {
-                                    if (it.isNotBlank()) {
-                                        viewModel.getWeather(it, 500)
-                                    }
-                                    searchWidgetState = SearchWidgetState.CLOSED
-                                },
-                                focusRequester = focusRequester
-                            )
-                        }
-                        SearchWidgetState.CLOSED -> {
-                            WeatherAppBar(
-                                modifier = Modifier.padding(top = statusBarPaddings.calculateTopPadding()),
-                                cityName = weatherState.cityName,
-                                onSearchClicked = { searchWidgetState = SearchWidgetState.OPENED },
-                                onMicClicked = {
-                                    val intent =
-                                        Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                                            putExtra(
-                                                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                                                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-                                            )
-                                            putExtra(
-                                                RecognizerIntent.EXTRA_LANGUAGE,
-                                                Locale.getDefault()
-                                            )
-                                            putExtra(
-                                                RecognizerIntent.EXTRA_PROMPT,
-                                                "Say the name of the city"
-                                            )
-                                            putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
-                                        }
-                                    speechRecognizerLauncher.launch(intent)
-                                }
-                            )
-                        }
+    val locationPermissionState = rememberPermissionState(
+        permission = Manifest.permission.ACCESS_FINE_LOCATION
+    )
+    when {
+        locationPermissionState.hasPermission -> {
+            viewModel.onLocationPermissionGranted()
+        }
+        locationPermissionState.shouldShowRationale -> {
+            PermissionDialog(
+                title = stringResource(R.string.permission_required),
+                message = stringResource(R.string.location_permission_rationale),
+                confirmButtonText = stringResource(R.string.allow),
+                onConfirm = {
+                    locationPermissionState.launchPermissionRequest()
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { activity?.finishAffinity() }
+                    ) {
+                        Text(stringResource(R.string.deny))
                     }
                 }
-            }
-        ) {
-            ConstraintLayout(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                val (currentWeatherContainer, tabRow, forecastWeather) = createRefs()
-                val guideline = createGuidelineFromBottom(
-                    if (orientation == Configuration.ORIENTATION_LANDSCAPE) 0.35f else 0.23f
-                )
-                CurrentWeather(
-                    orientation = orientation,
+            )
+        }
+        !locationPermissionState.permissionRequested -> {
+            PermissionDialog(
+                title = stringResource(R.string.permission_required),
+                message = stringResource(R.string.location_permission_rationale),
+                confirmButtonText = stringResource(R.string.allow),
+                onConfirm = {
+                    locationPermissionState.launchPermissionRequest()
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { activity?.finishAffinity() }
+                    ) {
+                        Text(stringResource(R.string.deny))
+                    }
+                }
+            )
+        }
+        locationPermissionState.isPermanentlyDenied() -> {
+            PermissionDialog(
+                title = stringResource(R.string.permission_required),
+                message = stringResource(R.string.location_permission_permanently_denied),
+                confirmButtonText = stringResource(R.string.ok),
+                onConfirm = {
+                    activity?.finishAffinity()
+                }
+            )
+        }
+    }
+
+
+    Scaffold(
+        scaffoldState = scaffoldState,
+        backgroundColor = backgroundColor.value,
+        topBar = {
+            if (weatherState.isLoading) {
+                LoadingAppBar(
                     modifier = Modifier
-                        .constrainAs(currentWeatherContainer) {
-                            top.linkTo(parent.top)
-                            bottom.linkTo(tabRow.top)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                            height = Dimension.fillToConstraints
-                            width = Dimension.fillToConstraints
-                        },
-                    currentWeather = weatherState.currentWeather,
-                    dayType = dayType
+                        .padding(top = statusBarPaddings.calculateTopPadding())
+                        .fillMaxWidth()
+                        .height(56.dp)
                 )
-                TabRow(
-                    modifier = Modifier
-                        .constrainAs(tabRow) {
-                            bottom.linkTo(forecastWeather.top)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                            height = Dimension.wrapContent
-                            width = Dimension.fillToConstraints
-                        },
-                    selectedTabIndex = tabRowState,
-                    backgroundColor = MaterialTheme.colors.surface,
-                ) {
-                    titles.forEachIndexed { index, title ->
-                        Tab(
-                            text = { Text(title) },
-                            selected = tabRowState == index,
-                            onClick = {
-                                tabRowState = index
+            } else {
+                when (searchWidgetState) {
+                    SearchWidgetState.OPENED -> {
+                        SearchAppBar(
+                            modifier = Modifier
+                                .padding(top = statusBarPaddings.calculateTopPadding())
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            onCloseClicked = { searchWidgetState = SearchWidgetState.CLOSED },
+                            onSearchClicked = {
+                                if (it.isNotBlank()) {
+                                    viewModel.getWeather(it, 500)
+                                }
+                                searchWidgetState = SearchWidgetState.CLOSED
+                            },
+                            focusRequester = focusRequester
+                        )
+                    }
+                    SearchWidgetState.CLOSED -> {
+                        WeatherAppBar(
+                            modifier = Modifier.padding(top = statusBarPaddings.calculateTopPadding()),
+                            cityName = weatherState.cityName,
+                            onSearchClicked = { searchWidgetState = SearchWidgetState.OPENED },
+                            onMicClicked = {
+                                val intent =
+                                    Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                                        putExtra(
+                                            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                                            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                                        )
+                                        putExtra(
+                                            RecognizerIntent.EXTRA_LANGUAGE,
+                                            Locale.getDefault()
+                                        )
+                                        putExtra(
+                                            RecognizerIntent.EXTRA_PROMPT,
+                                            "Say the name of the city"
+                                        )
+                                        putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
+                                    }
+                                speechRecognizerLauncher.launch(intent)
                             }
                         )
                     }
                 }
-                LazyRow(
-                    modifier = Modifier
-                        .constrainAs(forecastWeather) {
-                            top.linkTo(guideline)
-                            bottom.linkTo(parent.bottom)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                            height = Dimension.fillToConstraints
-                            width = Dimension.fillToConstraints
+            }
+        }
+    ) {
+        ConstraintLayout(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            val (currentWeatherContainer, tabRow, forecastWeather) = createRefs()
+            val guideline = createGuidelineFromBottom(
+                if (orientation == Configuration.ORIENTATION_LANDSCAPE) 0.35f else 0.23f
+            )
+            CurrentWeather(
+                orientation = orientation,
+                modifier = Modifier
+                    .constrainAs(currentWeatherContainer) {
+                        top.linkTo(parent.top)
+                        bottom.linkTo(tabRow.top)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        height = Dimension.fillToConstraints
+                        width = Dimension.fillToConstraints
+                    },
+                currentWeather = weatherState.currentWeather,
+                dayType = dayType
+            )
+            TabRow(
+                modifier = Modifier
+                    .constrainAs(tabRow) {
+                        bottom.linkTo(forecastWeather.top)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        height = Dimension.wrapContent
+                        width = Dimension.fillToConstraints
+                    },
+                selectedTabIndex = tabRowState,
+                backgroundColor = MaterialTheme.colors.surface,
+            ) {
+                titles.forEachIndexed { index, title ->
+                    Tab(
+                        text = { Text(title) },
+                        selected = tabRowState == index,
+                        onClick = {
+                            tabRowState = index
                         }
-                        .background(MaterialTheme.colors.surface),
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    verticalAlignment = Alignment.CenterVertically,
-                    contentPadding = PaddingValues(14.dp)
-                ) {
-                    if (tabRowState == 0) {
-                        val hourFormatter = DateTimeFormatter.ofPattern(pattern)
-                        items(weatherState.hourlyForecast) { forecast ->
-                            ForecastListItem(
-                                orientation = orientation,
-                                dateFormatter = hourFormatter,
-                                forecast = forecast
-                            )
-                        }
-                    } else {
-                        val dayFormatter = DateTimeFormatter.ofPattern("EEE", Locale.getDefault())
-                        items(weatherState.dailyForecast) { forecast ->
-                            ForecastListItem(
-                                orientation = orientation,
-                                dateFormatter = dayFormatter,
-                                forecast = forecast
-                            )
-                        }
+                    )
+                }
+            }
+            LazyRow(
+                modifier = Modifier
+                    .constrainAs(forecastWeather) {
+                        top.linkTo(guideline)
+                        bottom.linkTo(parent.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        height = Dimension.fillToConstraints
+                        width = Dimension.fillToConstraints
+                    }
+                    .background(MaterialTheme.colors.surface),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically,
+                contentPadding = PaddingValues(14.dp)
+            ) {
+                if (tabRowState == 0) {
+                    val hourFormatter = DateTimeFormatter.ofPattern(pattern)
+                    items(weatherState.hourlyForecast) { forecast ->
+                        ForecastListItem(
+                            orientation = orientation,
+                            dateFormatter = hourFormatter,
+                            forecast = forecast
+                        )
+                    }
+                } else {
+                    val dayFormatter = DateTimeFormatter.ofPattern("EEE", Locale.getDefault())
+                    items(weatherState.dailyForecast) { forecast ->
+                        ForecastListItem(
+                            orientation = orientation,
+                            dateFormatter = dayFormatter,
+                            forecast = forecast
+                        )
                     }
                 }
             }
