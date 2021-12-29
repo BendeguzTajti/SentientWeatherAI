@@ -22,7 +22,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -74,10 +73,6 @@ fun WeatherScreen(
             Color(0xFF65C2F5)
         }
     }
-    var searchWidgetState by rememberSaveable {
-        mutableStateOf(SearchWidgetState.CLOSED)
-    }
-    val focusRequester = remember { FocusRequester() }
     var tabRowState by rememberSaveable { mutableStateOf(0) }
     val titles = stringArrayResource(id = R.array.forecast_types)
     val pattern = if (DateFormat.is24HourFormat(LocalContext.current)) "HH:mm" else "hh:mm"
@@ -148,59 +143,34 @@ fun WeatherScreen(
         scaffoldState = scaffoldState,
         backgroundColor = backgroundColor.value,
         topBar = {
-            if (weatherState.isLoading) {
-                LoadingAppBar(
-                    modifier = Modifier
-                        .padding(top = statusBarPaddings.calculateTopPadding())
-                        .fillMaxWidth()
-                        .height(56.dp)
-                )
-            } else {
-                when (searchWidgetState) {
-                    SearchWidgetState.OPENED -> {
-                        SearchAppBar(
-                            modifier = Modifier
-                                .padding(top = statusBarPaddings.calculateTopPadding())
-                                .fillMaxWidth()
-                                .height(56.dp),
-                            onCloseClicked = { searchWidgetState = SearchWidgetState.CLOSED },
-                            onSearchClicked = {
-                                if (it.isNotBlank()) {
-                                    viewModel.getWeather(it, 500)
-                                }
-                                searchWidgetState = SearchWidgetState.CLOSED
-                            },
-                            focusRequester = focusRequester
-                        )
+            WeatherAppBar(
+                statusBarPaddings = statusBarPaddings,
+                weatherState = weatherState,
+                onSearchClicked = {
+                    if (it.isNotBlank()) {
+                        viewModel.getWeather(it, 500)
                     }
-                    SearchWidgetState.CLOSED -> {
-                        WeatherAppBar(
-                            modifier = Modifier.padding(top = statusBarPaddings.calculateTopPadding()),
-                            cityName = weatherState.cityName,
-                            onSearchClicked = { searchWidgetState = SearchWidgetState.OPENED },
-                            onMicClicked = {
-                                val intent =
-                                    Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                                        putExtra(
-                                            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                                            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-                                        )
-                                        putExtra(
-                                            RecognizerIntent.EXTRA_LANGUAGE,
-                                            Locale.getDefault()
-                                        )
-                                        putExtra(
-                                            RecognizerIntent.EXTRA_PROMPT,
-                                            "Say the name of the city"
-                                        )
-                                        putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
-                                    }
-                                speechRecognizerLauncher.launch(intent)
-                            }
-                        )
-                    }
+                },
+                onMicClicked = {
+                    val intent =
+                        Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                            putExtra(
+                                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+                            )
+                            putExtra(
+                                RecognizerIntent.EXTRA_LANGUAGE,
+                                Locale.getDefault()
+                            )
+                            putExtra(
+                                RecognizerIntent.EXTRA_PROMPT,
+                                "Say the name of the city"
+                            )
+                            putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
+                        }
+                    speechRecognizerLauncher.launch(intent)
                 }
-            }
+            )
         }
     ) {
         ConstraintLayout(
