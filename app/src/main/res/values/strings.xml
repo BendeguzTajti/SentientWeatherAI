@@ -14,4 +14,5 @@
     <string name="ok">OK</string>
     <string name="location_permission_permanently_denied">Location permission denied. Please grant access on the Settings screen.</string>
     <string name="searching">Searching…</string>
+    <string name="retry">Retry</string>
 </resources>

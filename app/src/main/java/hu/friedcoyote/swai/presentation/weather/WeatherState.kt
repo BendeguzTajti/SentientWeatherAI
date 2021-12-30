@@ -8,5 +8,5 @@ data class WeatherState(
     val currentWeather: Weather? = null,
     val hourlyForecast: List<Weather> = emptyList(),
     val dailyForecast: List<Weather> = emptyList(),
-    val error: String = ""
+    val initErrorResId: Int? = null
 )

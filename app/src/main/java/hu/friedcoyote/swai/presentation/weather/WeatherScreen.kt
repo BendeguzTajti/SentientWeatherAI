@@ -77,6 +77,20 @@ fun WeatherScreen(
     val titles = stringArrayResource(id = R.array.forecast_types)
     val pattern = if (DateFormat.is24HourFormat(LocalContext.current)) "HH:mm" else "hh:mm"
     val searchError = viewModel.searchError.collectAsState(initial = null)
+    if (weatherState.initErrorResId != null) {
+        val message = stringResource(weatherState.initErrorResId!!)
+        val actionLabel = stringResource(R.string.retry)
+        LaunchedEffect(weatherState.initErrorResId) {
+            val snackbarResult = scaffoldState.snackbarHostState.showSnackbar(
+                message = message,
+                actionLabel = actionLabel,
+                duration = SnackbarDuration.Indefinite
+            )
+            if (snackbarResult == SnackbarResult.ActionPerformed) {
+                viewModel.getWeatherByUserLocation()
+            }
+        }
+    }
     if (searchError.value != null) {
         val message = stringResource(searchError.value!!)
         LaunchedEffect(searchError.value) {

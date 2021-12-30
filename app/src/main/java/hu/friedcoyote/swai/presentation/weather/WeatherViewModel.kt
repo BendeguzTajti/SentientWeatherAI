@@ -33,11 +33,11 @@ class WeatherViewModel @Inject constructor(
 
     fun onLocationPermissionGranted() {
         if (getWeatherJob == null) {
-            getWeather()
+            getWeatherByUserLocation()
         }
     }
 
-    private fun getWeather(delayInMillis: Long = 500) {
+    fun getWeatherByUserLocation(delayInMillis: Long = 500) {
         getWeatherJob?.cancel()
         getWeatherJob = weatherUseCases.getWeatherByLocationUseCase()
             .onEach { result ->
@@ -59,7 +59,9 @@ class WeatherViewModel @Inject constructor(
                         )
                     }
                     is Resource.Error -> {
-                        // TODO HANDLE ERROR
+                        _weatherState.value = WeatherState(
+                            initErrorResId = result.errorMessageResId
+                        )
                     }
                 }
             }
@@ -88,14 +90,17 @@ class WeatherViewModel @Inject constructor(
                             cityName = result.data?.cityName ?: "",
                             currentWeather = result.data?.currentWeather,
                             hourlyForecast = result.data?.hourlyForecasts ?: emptyList(),
-                            dailyForecast = result.data?.dailyForecasts ?: emptyList()
+                            dailyForecast = result.data?.dailyForecasts ?: emptyList(),
+                            initErrorResId = null
                         )
                     }
                     is Resource.Error -> {
                         _weatherState.value = weatherState.value.copy(
                             isLoading = false,
                         )
-                        _searchError.emit(result.errorMessageResId)
+                        if (_weatherState.value.initErrorResId == null) {
+                            _searchError.emit(result.errorMessageResId)
+                        }
                     }
                 }
             }

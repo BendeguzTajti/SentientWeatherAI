@@ -1,14 +1,9 @@
 package hu.friedcoyote.swai.presentation.weather.components
 
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -29,21 +24,11 @@ fun DefaultAppBar(
         modifier = modifier,
         title = {
             if (weatherState.isLoading) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = Color.White,
-                        strokeWidth = 2.dp
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.searching),
-                        style = MaterialTheme.typography.subtitle1,
-                        color = Color.White
-                    )
-                }
+                Text(
+                    text = stringResource(R.string.searching),
+                    style = MaterialTheme.typography.subtitle1,
+                    color = Color.White
+                )
             } else {
                 Text(
                     text = weatherState.cityName,
