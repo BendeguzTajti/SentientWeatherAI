@@ -7,6 +7,7 @@
     </string-array>
     <string name="internet_error">Your\'re offline. Check your connection</string>
     <string name="server_error">"The server is currently overloaded. Please try again later"</string>
+    <string name="no_location_error">"Your location was not found. Please enable your GPS"</string>
     <string name="permission_required">Permission required</string>
     <string name="location_permission_rationale">The app needs to access your location in order to work.</string>
     <string name="allow">Allow</string>
@@ -15,4 +16,6 @@
     <string name="location_permission_permanently_denied">Location permission denied. Please grant access on the Settings screen.</string>
     <string name="searching">Searching…</string>
     <string name="retry">Retry</string>
+    <string name="speech_recognition_extra_prompt">Say the name of the city</string>
+    <string name="search_text_placeholder">Search city</string>
 </resources>

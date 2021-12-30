@@ -49,19 +49,24 @@ class WeatherRepositoryImpl @Inject constructor(
         emit(Resource.Loading())
         try {
             val location = fusedLocationProviderClient.awaitLastLocation()
-            val address = getAddressByLocation(location.latitude, location.longitude)
-            val weatherDto = api.getCurrentWeather(
-                location.latitude,
-                location.longitude,
-                "minutely",
-                Constants.APP_ID,
-                Locale.current.language
-            )
-            emit(
-                Resource.Success(
-                    weatherDto.toWeather(address.locality ?: address.adminArea)
+            if (location != null) {
+                val address = getAddressByLocation(location.latitude, location.longitude)
+                val weatherDto = api.getCurrentWeather(
+                    location.latitude,
+                    location.longitude,
+                    "minutely",
+                    Constants.APP_ID,
+                    Locale.current.language
                 )
-            )
+                emit(
+                    Resource.Success(
+                        weatherDto.toWeather(address.locality ?: address.adminArea)
+                    )
+                )
+            } else {
+                // last location was not found on the device
+                emit(Resource.Error(R.string.no_location_error))
+            }
         } catch (e: HttpException) {
             emit(Resource.Error(R.string.server_error))
         } catch (e: UnknownHostException) {

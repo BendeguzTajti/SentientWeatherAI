@@ -15,10 +15,12 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import hu.friedcoyote.swai.R
 import hu.friedcoyote.swai.util.toCityName
 
 @Composable
@@ -47,7 +49,7 @@ fun SearchAppBar(
                 Text(
                     modifier = Modifier
                         .alpha(ContentAlpha.medium),
-                    text = "Search city",
+                    text = stringResource(R.string.search_text_placeholder),
                     color = Color.White,
                     style = MaterialTheme.typography.subtitle1
                 )

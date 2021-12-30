@@ -58,6 +58,7 @@ fun WeatherScreen(
                 viewModel.getWeather(recognizedWords.first(), 500)
             }
         }
+    val extraPrompt = stringResource(R.string.speech_recognition_extra_prompt)
     val weatherState by viewModel.weatherState
     val dayType by viewModel.dayType
     val dayChangeTransition = updateTransition(
@@ -152,7 +153,6 @@ fun WeatherScreen(
         }
     }
 
-
     Scaffold(
         scaffoldState = scaffoldState,
         backgroundColor = backgroundColor.value,
@@ -178,7 +178,7 @@ fun WeatherScreen(
                             )
                             putExtra(
                                 RecognizerIntent.EXTRA_PROMPT,
-                                "Say the name of the city"
+                                extraPrompt
                             )
                             putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
                         }

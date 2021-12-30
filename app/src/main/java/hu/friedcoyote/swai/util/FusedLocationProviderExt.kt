@@ -9,13 +9,13 @@ import kotlin.coroutines.resumeWithException
 
 @ExperimentalCoroutinesApi
 @SuppressLint("MissingPermission")
-suspend fun FusedLocationProviderClient.awaitLastLocation(): Location =
+suspend fun FusedLocationProviderClient.awaitLastLocation(): Location? =
 
     // Create a new coroutine that can be cancelled
-    suspendCancellableCoroutine<Location> { continuation ->
+    suspendCancellableCoroutine<Location?> { continuation ->
 
         // Add listeners that will resume the execution of this coroutine
-        lastLocation.addOnSuccessListener { location ->
+        lastLocation.addOnSuccessListener { location: Location? ->
             // Resume coroutine and return location
             continuation.resume(location) {
                 // cancelled

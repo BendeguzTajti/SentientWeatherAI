@@ -8,6 +8,7 @@
     </string-array>
     <string name="internet_error">Offline állapotban vagy; ellenőrizd az internetkapcsolatot</string>
     <string name="server_error">A szerver jelenleg túlterhelt. Kérlek próbáld meg később</string>
+    <string name="no_location_error">"Nincsenek helyadataid. Kérlek kapcsold be a GPS navigációt"</string>
     <string name="permission_required">Engedély szükséges</string>
     <string name="location_permission_rationale">Az alkalmazásnak hozzá kell férnie a készülék helyadataihoz, hogy működjön.</string>
     <string name="allow">Engedélyezés</string>
@@ -15,4 +16,7 @@
     <string name="ok">Rendben</string>
     <string name="location_permission_permanently_denied">Az alkalmazás nem tud hozzáférni a készülék helyadataihoz. Kérlek engedélyezd a hozzáfést a Beállítások menüben.</string>
     <string name="searching">Keresés…</string>
+    <string name="retry">Újra</string>
+    <string name="speech_recognition_extra_prompt">Mondj egy települést</string>
+    <string name="search_text_placeholder">Keress települést</string>
 </resources>
