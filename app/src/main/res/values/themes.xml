@@ -14,6 +14,13 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="Theme.SWAI.SplashScreen" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/app_logo</item>
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+        <item name="postSplashScreenTheme">@style/Theme.SWAI.NoActionBar</item>
+    </style>
+
     <style name="Theme.SWAI.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
