@@ -23,6 +23,6 @@ You can also search for a town/city by speech or text and the app will display t
 The app will also change its colors depending on the location's sunset/sunrise data.
 
 <p float="left">
-  <img src="https://github.com/BendeguzTajti/VSensei/blob/main/README%20files/guess-the-meaning.gif" width="400" height="700" />
-  <img src="https://github.com/BendeguzTajti/VSensei/blob/main/README%20files/guess-the-word.gif" width="400" height="700" />
+  <img src="https://github.com/BendeguzTajti/SentientWeatherAI/blob/main/README%20files/search-by-speech.gif" width="400" height="700" />
+  <img src="https://github.com/BendeguzTajti/SentientWeatherAI/blob/main/README%20files/search-by-text.gif" width="400" height="700" />
 </p>
