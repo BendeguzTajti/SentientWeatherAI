@@ -13,9 +13,6 @@ Sentient Weather AI (SWAI) is a simple weather app, that shows you detailed weat
 I also created a mock design in `Figma`, which you can find here: 
 https://www.figma.com/file/RgSBnVwcfVTov57keaVQv8/SWAI?node-id=0%3A1
 
-I also created a similar weather app a long time ago, that uses libraries such as `RxJava`, and `Lottie`, which you can find here:
-https://github.com/BendeguzTajti/Sentient-Weather-AI
-
 ## Usage
 
 After you accepted the location permission the app will show you the latest weather data at your current location.
